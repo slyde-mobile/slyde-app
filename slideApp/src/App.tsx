@@ -1,22 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {
   CHAIN_NAMESPACES,
   IProvider,
   WALLET_ADAPTERS,
 } from "@web3auth/base";
-import RPC from "./solanaRPC"
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+import LoggedIn from "./LoggedIn";
 import './App.css'
 
-function uiConsole(...args: any[]): void {
-  const el = document.querySelector("#console>p");
-  if (el) {
-    el.innerHTML = JSON.stringify(args || {}, null, 2);
-  }
-}
 
 
 function App() {
@@ -91,23 +86,6 @@ function App() {
 
     setProvider(web3authProvider);
   };
-  const authenticateUser = async () => {
-    if (!web3auth) {
-      uiConsole("web3auth not initialized yet");
-      return;
-    }
-    const idToken = await web3auth.authenticateUser();
-    uiConsole(idToken);
-  };
-
-  const getUserInfo = async () => {
-    if (!web3auth) {
-      uiConsole("web3auth not initialized yet");
-      return;
-    }
-    const user = await web3auth.getUserInfo();
-    uiConsole(user);
-  };
 
   const logout = async () => {
     if (!web3auth) {
@@ -119,128 +97,71 @@ function App() {
     setLoggedIn(false);
   };
 
-  const getAccounts = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(provider);
-    const address = await rpc.getAccounts();
-    uiConsole(address);
-  };
-
-  const getBalance = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(provider);
-    const balance = await rpc.getBalance();
-    uiConsole(balance);
-  };
-
-  const sendTransaction = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(provider);
-    const receipt = await rpc.sendTransaction();
-    uiConsole(receipt);
-  };
-
-  const signMessage = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(provider);
-    const signedMessage = await rpc.signMessage();
-    uiConsole(signedMessage);
-  };
-
-  const getPrivateKey = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(provider);
-    const privateKey = await rpc.getPrivateKey();
-    uiConsole(privateKey);
-  };
-
   const loggedOutView = (
     <div className="card">
     <Button
-      color="primary"
-      size="large"
+      variant='contained'
+      fullWidth={true}
       onClick={() => loginWithGoogle()}
-    >Login with Google Jamz</Button>
+    >Login with Google</Button>
     <p>
       Edit <code>src/App.tsx</code> and save to test HMR
     </p>
   </div>
   );
 
-  const loggedInView = (
-    <>
-      <div className="flex-container">
-        <div>
-          <button onClick={getUserInfo} className="card">
-            Get User Info
-          </button>
-        </div>
-        <div>
-          <button onClick={authenticateUser} className="card">
-            Get ID Token
-          </button>
-        </div>
-        <div>
-          <button onClick={getAccounts} className="card">
-            Get Accounts
-          </button>
-        </div>
-        <div>
-          <button onClick={getBalance} className="card">
-            Get Balance
-          </button>
-        </div>
-        <div>
-          <button onClick={signMessage} className="card">
-            Sign Message
-          </button>
-        </div>
-        <div>
-          <button onClick={sendTransaction} className="card">
-            Send Transaction
-          </button>
-        </div>
-        <div>
-          <button onClick={getPrivateKey} className="card">
-            Get Private Key
-          </button>
-        </div>
-        <div>
-          <button onClick={logout} className="card">
-            Log Out
-          </button>
-        </div>
-      </div>
-      <div id="console" style={{ whiteSpace: "pre-line" }}>
-        <p style={{ whiteSpace: "pre-line" }}>Logged in Successfully!</p>
-      </div>
-    </>
+  const loggedInProps = {
+    provider,
+    web3auth,
+    logoutFn:logout
+  }
+
+  const ConditionalComponent = ({ ...props }) => (
+    loggedIn ? <LoggedIn {...props} /> : loggedOutView
   );
 
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#fff',
+        light: '#813ef9',
+        dark: '#0e1848',
+      },
+      secondary: {
+        main: '#f2b842',
+      },
+      background: {
+        default: '#813ef9',
+      }
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#f2b842',
+            borderColor: '#2d2d2d',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderRadius: 0,
+            '&:hover': {
+              backgroundColor: '#d9a534', // A slightly darker shade when hovered
+            },
+          },
+        },
+      },
+    },
+  });
+  
+
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <h3>logo</h3>
       <h1>Slyde</h1>
-      <div>{loggedIn ? loggedInView : loggedOutView}</div>
+      <div>{ConditionalComponent({ ...loggedInProps})}</div>
       <p className="read-the-docs">
         Sup ducks
       </p>
-    </>
+    </ThemeProvider>
   )
 }
 
