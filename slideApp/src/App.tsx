@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@mui/material';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { uiConsole } from "./util";
+import { ThemeProvider } from '@mui/material/styles';
+import theme from './Theme'
 import {
   CHAIN_NAMESPACES,
   IProvider,
@@ -36,7 +38,7 @@ function App() {
         };
         // eslint-disable-next-line @typescript-eslint/no-shadow
         const web3auth = new Web3AuthNoModal({
-          clientId: "BGsSfLD9Y8KSvwOxvZTKfZYsAFUaKU0sog5G7X-Bs7SWg9bSSgXMI4PYbT1S4zJM8ylXAffvT3YusA2fh0afyIs", // Get your Client ID from the Web3Auth Dashboard
+          clientId: "BGsSfLD9Y8KSvwOxvZTKfZYsAFUaKU0sog5G7X-Bs7SWg9bSSgXMI4PYbT1S4zJM8ylXAffvT3YusA2fh0afyIs", 
           web3AuthNetwork: "sapphire_devnet", // Web3Auth Network
           chainConfig,
         });
@@ -46,17 +48,17 @@ function App() {
         const privateKeyProvider = new SolanaPrivateKeyProvider({ config: { chainConfig } });
 
         const openloginAdapter = new OpenloginAdapter({
-          adapterSettings: {
-            uxMode: "popup",
-            loginConfig: {
-              // Google login
-              google: {
-                verifier: "slyde", // Pass the Verifier name here
-                typeOfLogin: "google", // Pass on the login provider of the verifier you've created
-                clientId: "345754597602-8s1fodms1smf0rp19s42atht2bqmqq91.apps.googleusercontent.com", // Pass on the Google `Client ID` here
-              },
-            },
-          },
+          // adapterSettings: {
+          //   uxMode: "popup",
+          //   loginConfig: {
+          //     // Google login
+          //     google: {
+          //       verifier: "web3auth-google-sapphire-devnet",
+          //       typeOfLogin: "google", // Pass on the login provider of the verifier you've created
+          //       clientId: "345754597602-8s1fodms1smf0rp19s42atht2bqmqq91.apps.googleusercontent.com", // Pass on the Google `Client ID` here
+          //     },
+          //   },
+          // },
           privateKeyProvider
         });
 
@@ -98,16 +100,17 @@ function App() {
   };
 
   const loggedOutView = (
-    <div className="card">
-    <Button
-      variant='contained'
-      fullWidth={true}
-      onClick={() => loginWithGoogle()}
-    >Login with Google</Button>
-    <p>
-      Edit <code>src/App.tsx</code> and save to test HMR
-    </p>
-  </div>
+    <>
+      <h3>logo</h3>
+      <h1>Slyde</h1>
+      <div className="card">
+        <Button
+          variant='contained'
+          fullWidth={true}
+          onClick={() => loginWithGoogle()}
+        >Login with Google</Button>
+      </div>
+    </>
   );
 
   const loggedInProps = {
@@ -119,48 +122,11 @@ function App() {
   const ConditionalComponent = ({ ...props }) => (
     loggedIn ? <LoggedIn {...props} /> : loggedOutView
   );
-
-  const theme = createTheme({
-    palette: {
-      primary: {
-        main: '#fff',
-        light: '#813ef9',
-        dark: '#0e1848',
-      },
-      secondary: {
-        main: '#f2b842',
-      },
-      background: {
-        default: '#813ef9',
-      }
-    },
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            backgroundColor: '#f2b842',
-            borderColor: '#2d2d2d',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            borderRadius: 0,
-            '&:hover': {
-              backgroundColor: '#d9a534', // A slightly darker shade when hovered
-            },
-          },
-        },
-      },
-    },
-  });
   
 
   return (
     <ThemeProvider theme={theme}>
-      <h3>logo</h3>
-      <h1>Slyde</h1>
       <div>{ConditionalComponent({ ...loggedInProps})}</div>
-      <p className="read-the-docs">
-        Sup ducks
-      </p>
     </ThemeProvider>
   )
 }
