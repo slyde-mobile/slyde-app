@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "prestart": "NODE_ENV=dev node ./slyde-config/merge-config.js && tsc",
+    "start": "NODE_ENV=dev vite",
+    "poststart": "NODE_ENV=dev node ./slyde-config/cleanup-config.js",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -18,11 +20,15 @@
     "@mui/material": "^5.14.13",
     "@mui/styled-engine-sc": "^6.0.0-alpha.1",
     "@solana/web3.js": "^1.87.1",
+    "@toruslabs/eccrypto": "^4.0.0",
+    "@toruslabs/openlogin-ed25519": "^5.0.0",
     "@web3auth/base-provider": "^7.0.4",
     "@web3auth/ethereum-provider": "^7.0.4",
     "@web3auth/no-modal": "^7.0.4",
     "@web3auth/openlogin-adapter": "^7.0.4",
     "@web3auth/solana-provider": "^7.0.4",
+    "axios": "^1.5.1",
+    "json2toml": "^6.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "styled-components": "^6.0.9"

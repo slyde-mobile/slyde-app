@@ -14,7 +14,8 @@ import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import LoggedIn from "./LoggedIn";
 import './App.css'
 
-
+console.log(import.meta.env);
+const RPC_URL = import.meta.env.VITE_solanaRpcBaseUrl + '?api-key=' + import.meta.env.VITE_solanaRpcKey;
 
 function App() {
   const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
@@ -29,16 +30,16 @@ function App() {
         // Initialize within useEffect()
         const chainConfig = {
           chainNamespace: CHAIN_NAMESPACES.SOLANA,
-          chainId: "0x1", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
-          rpcTarget: "https://rpc.helius.xyz/?api-key=fe3b26a1-a339-41b6-9448-4410f6c67216",
+          chainId: import.meta.env.VITE_solanaChainId, // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
+          rpcTarget: RPC_URL,
           displayName: "Solana Mainnet",
-          blockExplorer: "https://explorer.solana.com",
+          blockExplorer: import.meta.env.VITE_solanaBlockExplorer,
           ticker: "SOL",
           tickerName: "Solana",
         };
         // eslint-disable-next-line @typescript-eslint/no-shadow
         const web3auth = new Web3AuthNoModal({
-          clientId: "BGsSfLD9Y8KSvwOxvZTKfZYsAFUaKU0sog5G7X-Bs7SWg9bSSgXMI4PYbT1S4zJM8ylXAffvT3YusA2fh0afyIs", 
+          clientId: import.meta.env.VITE_web3AuthclientId, 
           web3AuthNetwork: "sapphire_devnet", // Web3Auth Network
           chainConfig,
         });
@@ -48,17 +49,6 @@ function App() {
         const privateKeyProvider = new SolanaPrivateKeyProvider({ config: { chainConfig } });
 
         const openloginAdapter = new OpenloginAdapter({
-          // adapterSettings: {
-          //   uxMode: "popup",
-          //   loginConfig: {
-          //     // Google login
-          //     google: {
-          //       verifier: "web3auth-google-sapphire-devnet",
-          //       typeOfLogin: "google", // Pass on the login provider of the verifier you've created
-          //       clientId: "345754597602-8s1fodms1smf0rp19s42atht2bqmqq91.apps.googleusercontent.com", // Pass on the Google `Client ID` here
-          //     },
-          //   },
-          // },
           privateKeyProvider
         });
 

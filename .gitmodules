@@ -1,0 +1,3 @@
+[submodule "slideApp/slyde-config"]
+	path = slideApp/slyde-config
+	url = git@github.com:B4dvd/slyde-config.git
