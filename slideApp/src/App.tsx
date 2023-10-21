@@ -14,8 +14,7 @@ import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import LoggedIn from "./LoggedIn";
 import './App.css'
 
-console.log(import.meta.env);
-const RPC_URL = import.meta.env.VITE_solanaRpcBaseUrl + '?api-key=' + import.meta.env.VITE_solanaRpcKey;
+const RPC_URL = import.meta.env.VITE_SOLANA_RPC_BASE_URL + '?api-key=' + import.meta.env.VITE_SOLANA_RPC_KEY;
 
 function App() {
   const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
@@ -30,16 +29,16 @@ function App() {
         // Initialize within useEffect()
         const chainConfig = {
           chainNamespace: CHAIN_NAMESPACES.SOLANA,
-          chainId: import.meta.env.VITE_solanaChainId, // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
+          chainId: import.meta.env.VITE_SOLANA_CHAIN_ID, // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
           rpcTarget: RPC_URL,
           displayName: "Solana Mainnet",
-          blockExplorer: import.meta.env.VITE_solanaBlockExplorer,
+          blockExplorer: import.meta.env.VITE_SOLANA_BLOCK_EXPLORER,
           ticker: "SOL",
           tickerName: "Solana",
         };
         // eslint-disable-next-line @typescript-eslint/no-shadow
         const web3auth = new Web3AuthNoModal({
-          clientId: import.meta.env.VITE_web3AuthclientId, 
+          clientId: import.meta.env.VITE_WEB3_AUTHCLIENT_ID, 
           web3AuthNetwork: "sapphire_devnet", // Web3Auth Network
           chainConfig,
         });
@@ -65,7 +64,7 @@ function App() {
     };
 
     init();
-  }, []);
+  }, [loggedIn]);
 
   const loginWithGoogle = async () => {
     if (!web3auth) {

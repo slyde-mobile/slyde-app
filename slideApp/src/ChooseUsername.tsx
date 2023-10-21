@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
-import { Buffer } from "buffer/";
 import RPC from "./solanaRPC"
 import axios from 'axios';
 import { getED25519Key } from "@toruslabs/openlogin-ed25519";
 import { Button, InputAdornment, TextField, Typography } from '@mui/material';
+import { Buffer } from 'buffer/'
+
 
 function ChooseUsername(props: any) {
     const provider = props.provider;
@@ -34,7 +35,8 @@ function ChooseUsername(props: any) {
                 const privateKey = await web3auth.provider.request({
                     method: "solanaPrivateKey"
                   });
-                const hexPrivKey = Buffer.from(privateKey, "hex")
+                const hexPrivKey = Buffer.from(privateKey, "hex");
+                // @ts-expect-error
                 setPubKey(getED25519Key(hexPrivKey).pk.toString('hex')); 
             } catch (error) {
                 console.log(error);
