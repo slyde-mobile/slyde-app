@@ -127,3 +127,95 @@ function LoggedIn(props: any) {
 }
 
 export default LoggedIn
+
+// failed attempt at reverse lookup for an sns domain
+
+// if (address) {
+//   // Public key of bonfida.sol
+//   console.log(address, RPC_URL);
+//   // const domainKey = new PublicKey(address);
+//   const rpcConnection = new Connection(RPC_URL);              
+//   // const resolution = await resolve(rpcConnection, "asdf.slydedev.sol");
+//   // console.log(resolution.toBuffer());
+//   // const dk = getDomainKeySync("asdf.slydedev.sol");
+//   // console.log('correct domain key for address', dk.pubkey.toBase58());
+//   // const domainName = await reverseLookup(rpcConnection, domainKey);
+//   // console.log(domainName);
+//   // const SOL_TLD_AUTHORITY = new PublicKey(
+//   //   "58PwtjSDuFHuUkYjH9BYnnQKHfwo9reZhC2zMJv9JPkx"
+//   // );
+//   const filters = [
+//     {
+//       memcmp: {
+//         offset: 32,
+//         bytes: address,
+//       },
+//     },
+//     {
+//       memcmp: {
+//         offset: 0,
+//         bytes: '4b9bVPSELbWiWVZC6SijVYiYLxEEa6dNHTvMioKnhK4C',
+//       },
+//     },
+//   ];
+//   const trills = await rpcConnection.getProgramAccounts(NAME_PROGRAM_ID, {
+//     filters,
+//   });
+//   const domains = trills.map((a) => a.pubkey);
+//   console.log('domains', domains[0].toBase58());
+//   // const reverse1 = await reverseLookup(rpcConnection, new PublicKey('4b9bVPSELbWiWVZC6SijVYiYLxEEa6dNHTvMioKnhK4C'));
+//   // // const reverses = await reverseLookupBatch(rpcConnection, domains);
+//   // console.log('reverses', reverse1);
+
+//   const REVERSE_LOOKUP_CLASS = new PublicKey(
+//     "B4dvdm1V5PipGHuwyM7u7ePeCftvk2DsxRa2jVG1iKTy"
+//   );
+
+//   const hashedReverseLookup = getHashedNameSync(address);
+//   const reverseLookupAccount = getNameAccountKeySync(
+//     hashedReverseLookup,
+//     REVERSE_LOOKUP_CLASS
+//   );
+//   console.log('123');
+//   const { registry } = await NameRegistryState.retrieve(
+//     rpcConnection,
+//     reverseLookupAccount
+//   );
+//   console.log('abc');
+//   if (!registry.data) {
+//     console.log('no account data!');
+//     return;
+//   }
+//   const nameLength = new BN(registry.data.slice(0, 4), "le").toNumber();
+//   return registry.data.slice(4, 4 + nameLength).toString();
+
+
+// }
+
+
+
+  // useEffect(() => { 
+  //   const graphql = async () => {
+  //     const client = new ApolloClient({
+  //       uri: 'http://127.0.0.1:8080/graphql',
+  //       cache: new InMemoryCache(),
+  //     });
+
+  //     const ret = await client
+  //       .query({
+  //         query: gql`
+  //           query User($solanaPrimaryAddress: String) {
+  //             user (solanaPrimaryAddress: $solanaPrimaryAddress) {
+  //               solanaPrimaryAddress
+  //               solanaSns
+  //             }
+  //           }
+  //         `,
+  //         variables: {
+  //           solanaPrimaryAddress: address,
+  //         }
+  //       });
+  //     console.log('graphql return', ret);
+  //   };
+  //   graphql();
+  // }, []);

@@ -1,64 +1,58 @@
-import { useEffect, useState, useRef } from 'react';
-import RPC from "./solanaRPC"
-import axios from 'axios';
-import { getED25519Key } from "@toruslabs/openlogin-ed25519";
-import { Button, InputAdornment, TextField, Typography } from '@mui/material';
-import { Buffer } from 'buffer/'
+import { useRef, useContext, useState } from 'react';
+import { Button, InputAdornment, TextField, Typography, CircularProgress } from '@mui/material';
+import { ApolloClient, ApolloError, NormalizedCacheObject, gql } from '@apollo/client';
+import { ApolloContext } from './providers/ClientsProvider';
+import { User, useUser } from './providers/UserProvider';
 
+interface ClaimUsernameResponse {
+    claimUsername: User;
+  }
 
-function ChooseUsername(props: any) {
-    const provider = props.provider;
-    const web3auth = props.web3auth;
-    const [address, setAddress] = useState('');
-    const [userInfo, setUserInfo] = useState<any>({});
-    const [pubKey, setPubKey] = useState('');
+const CLAIM_USERNAME = gql`
+    mutation ClaimUsername($idToken: String, $web3AuthPublicKey: String, $account: String, $sns: String) {
+        claimUsername (idToken: $idToken, web3AuthPublicKey: $web3AuthPublicKey, account: $account, sns: $sns) {
+            account
+            sns
+        }
+    }
+`;
+
+function ChooseUsername() {
+    const [claiming, setClaiming] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const {web3User, account, web3AuthKey, setUser} = useUser();
 
     const inputRef = useRef<HTMLInputElement>();
-
-    useEffect(() => {
-        const getAddress = async () =>{
-            if (!provider) {
-                console.log("provider not initialized yet");
-                return;
-            }
-            if (!web3auth || !web3auth.connected) {
-                console.log("web3auth not initialized yet");
-                return;
-            }
-            const rpc = new RPC(provider);
-            const userInfo = await web3auth.getUserInfo();              
-            const accounts = await rpc.getAccounts();
-            setAddress(accounts[0]);
-            setUserInfo(userInfo);
-
-            try { 
-                const privateKey = await web3auth.provider.request({
-                    method: "solanaPrivateKey"
-                  });
-                const hexPrivKey = Buffer.from(privateKey, "hex");
-                // @ts-expect-error
-                setPubKey(getED25519Key(hexPrivKey).pk.toString('hex')); 
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        getAddress();
-      }, [web3auth.connected]);
+    const apolloClient : ApolloClient<NormalizedCacheObject> | undefined = useContext(ApolloContext);
 
     async function claimSNSDomainRequest() {
-        if (inputRef.current && inputRef.current !== null) {
+        if (apolloClient && inputRef.current && inputRef.current !== null && web3User != null) {
             const inputValue = inputRef.current.value;
             try {
-                const response = await axios.post('http://127.0.0.1:8080/v0/sns/claim', {
-                    idToken: userInfo.idToken,
-                    snsDomain: inputValue,
-                    claimingAddress: address, 
-                    publicKey: pubKey,
-                });
-                console.log(response.data);  // log the response to console
+                setError(null);
+                setClaiming(true);
+                const ret = await apolloClient.mutate<ClaimUsernameResponse>({
+                    mutation: CLAIM_USERNAME,
+                    variables: {
+                      idToken: web3User.idToken,
+                      web3AuthPublicKey: web3AuthKey,
+                      account,
+                      sns: inputValue.trim(),
+                    }
+                  });
+                console.log(ret);  // log the response to console
+                if (ret.data != null) {
+                    // this errors b/c the the object is not typed. i'd love to just call ret.data.user on this but it errors
+                    setUser(ret.data.claimUsername);
+                }
             } catch (error) {
-                console.error(error);  // log any error to console
+                if (error instanceof ApolloError) {
+                    setError(error.message);
+                } else {
+                    setError("Something went wrong.");
+                }         
             }
+            setClaiming(false);
         }
     }
 
@@ -71,9 +65,12 @@ function ChooseUsername(props: any) {
                     <TextField
                     fullWidth                    
                     variant="outlined"
+                    label={error ? "Error" : ""}
                     placeholder="Enter your username"
                     color="secondary"
                     inputRef={inputRef}
+                    error={!!error}
+                    helperText={error}
                     inputProps={{ style: { color: 'white' } }}
                     InputProps={{
                         endAdornment: (
@@ -87,10 +84,10 @@ function ChooseUsername(props: any) {
                     />                    
                 </div>
                 
-                <Button variant="contained" color="secondary" onClick={claimSNSDomainRequest} fullWidth style={{ marginBottom: '10px' }}>
-                    Choose Username
+                <Button disabled={claiming} variant="contained" color="secondary" onClick={claimSNSDomainRequest} fullWidth style={{ marginBottom: '10px' }}>
+                    {claiming ? <CircularProgress size={24} /> : 'Choose Username'}
                 </Button>
-                {address && <div><Typography variant="caption" color="textSecondary">{address}</Typography></div>}
+                {account && <div><Typography variant="caption" color="textSecondary">{account}</Typography></div>}
             </div>
         </>
     )

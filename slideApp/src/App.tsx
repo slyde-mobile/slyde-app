@@ -1,123 +1,120 @@
-import { useEffect, useState } from 'react'
-import { Button } from '@mui/material';
-import { uiConsole } from "./util";
-import { ThemeProvider } from '@mui/material/styles';
-import theme from './Theme'
-import {
-  CHAIN_NAMESPACES,
-  IProvider,
-  WALLET_ADAPTERS,
-} from "@web3auth/base";
+import { useEffect, useState, useContext } from 'react'
+import { getWeb3AuthPublicKey } from "./util";
+import RPC from "./solanaRPC"
 import { Web3AuthNoModal } from "@web3auth/no-modal";
-import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
-import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+import {
+  ADAPTER_STATUS,
+} from "@web3auth/base";
 import LoggedIn from "./LoggedIn";
+import LoggedOut from "./LoggedOut"
+import { ApolloClient, NormalizedCacheObject, gql } from '@apollo/client';
 import './App.css'
+import { ApolloContext, Web3AuthContext } from './providers/ClientsProvider';
+import { User, useUser } from './providers/UserProvider';
 
-const RPC_URL = import.meta.env.VITE_SOLANA_RPC_BASE_URL + '?api-key=' + import.meta.env.VITE_SOLANA_RPC_KEY;
+interface CreateUserResponse {
+  createUser: User;
+}
+
+const CREATE_USER = gql`
+  mutation CreateUser($idToken: String, $web3AuthPublicKey: String, $account: String, $emailAddress: String!) {
+    createUser (idToken: $idToken, web3AuthPublicKey: $web3AuthPublicKey, account: $account, emailAddress: $emailAddress) {
+      account
+      sns
+    }
+  }`;
 
 function App() {
-  const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
-  const [provider, setProvider] = useState<IProvider | null>(
-    null
-  );
-  const [loggedIn, setLoggedIn] = useState<boolean | null>(false);
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [web3authInitialized, setWeb3authInitialized] = useState<boolean>(false);
+
+  const {web3User, loggedIn, account, web3AuthKey, setUser, setWeb3User, setLoggedIn, setAccount, setWeb3AuthKey} = useUser();
+
+  const apolloClient : ApolloClient<NormalizedCacheObject> | undefined = useContext(ApolloContext);
+  const web3Auth : Web3AuthNoModal | undefined = useContext(Web3AuthContext);
+
+  const createOrLoginUser = async () => {
+    if (account == '' || apolloClient == null || web3User == null) {
+      return;
+    }
+  
+    const ret = await apolloClient.mutate<CreateUserResponse>({
+      mutation: CREATE_USER,
+      variables: {
+        idToken: web3User.idToken,
+        web3AuthPublicKey: web3AuthKey,
+        account,
+        emailAddress: web3User.email,
+        name: web3User.name,
+        profileImage: web3User.profileImage,
+      }
+    });
+    setUser(ret.data ? ret.data.createUser : null); 
+  };
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        // Initialize within useEffect()
-        const chainConfig = {
-          chainNamespace: CHAIN_NAMESPACES.SOLANA,
-          chainId: import.meta.env.VITE_SOLANA_CHAIN_ID, // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
-          rpcTarget: RPC_URL,
-          displayName: "Solana Mainnet",
-          blockExplorer: import.meta.env.VITE_SOLANA_BLOCK_EXPLORER,
-          ticker: "SOL",
-          tickerName: "Solana",
-        };
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-        const web3auth = new Web3AuthNoModal({
-          clientId: import.meta.env.VITE_WEB3_AUTHCLIENT_ID, 
-          web3AuthNetwork: "sapphire_devnet", // Web3Auth Network
-          chainConfig,
-        });
+    const init = async () => { 
+      // Ok to initialize the app we have to do a few things
+      // 1. Initialize the web3auth object
+      // 2. Once initialized, we can check if the user is already logged in
+      // 3. If they are logged in lets get their information
+      //    a. Web3Auth call: Get user info, especially the idToken jwt. we need this to verify our future calls.
+      //    b. Local derivation: Derive the web3auth public key from the private key
+      //    c. Web3Auth call: Get the solana addresses from the user
+      //    d. Graphql: Get the user from the server. We can see if this user exists, or create one if they don't.          
+      if (web3Auth != null && !web3authInitialized && web3Auth.status == ADAPTER_STATUS.NOT_READY) {
+        setWeb3authInitialized(true);
+      } else if (web3Auth != null && web3Auth.connected && web3Auth.provider) {
+        setWeb3authInitialized(true);
+          setWeb3AuthKey(await getWeb3AuthPublicKey(web3Auth));   
+          
+          const userInfo = await web3Auth.getUserInfo();
+          setWeb3User(userInfo);   
 
-        setWeb3auth(web3auth);
-
-        const privateKeyProvider = new SolanaPrivateKeyProvider({ config: { chainConfig } });
-
-        const openloginAdapter = new OpenloginAdapter({
-          privateKeyProvider
-        });
-
-        web3auth.configureAdapter(openloginAdapter);
-        await web3auth.init();
-
-        setProvider(web3auth.provider);
-        if (web3auth.connected) {
-          setLoggedIn(true);
+          if (account == '') {
+            const rpc = new RPC(web3Auth.provider);        
+            const accounts = await rpc.getAccounts();            
+            setAccount(accounts[0]);
+          } else {          
+            await createOrLoginUser();
+            setLoggedIn(true); 
+            setLoading(false);
+          }
         }
-      } catch (error) {
-        console.error(error);
-      }
     };
+    init(); 
+    
+  }, [web3Auth, loggedIn, account, web3User, web3authInitialized]);
 
-    init();
-  }, [loggedIn]);
 
-  const loginWithGoogle = async () => {
-    if (!web3auth) {
-      uiConsole("web3auth not initialized yet");
-      return;
+
+  // const logout = async () => {
+  //   if (!web3Auth) {
+  //     return;
+  //   }
+  //   await web3Auth.logout();
+  //   setLoggedIn(false);
+  //   setLoading(false);
+  // };
+
+
+  const loggedInProps = {};
+
+  const ConditionalComponent = ({ ...props }) => {
+    if (loading) {
+      return (<div>Loading...</div>);
     }
-    const web3authProvider = await web3auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
-      loginProvider: "google",
-    });
-
-    setProvider(web3authProvider);
+    return (    
+      loggedIn ? <LoggedIn {...props} /> : <LoggedOut {...props} />
+    );
   };
-
-  const logout = async () => {
-    if (!web3auth) {
-      uiConsole("web3auth not initialized yet");
-      return;
-    }
-    await web3auth.logout();
-    setProvider(null);
-    setLoggedIn(false);
-  };
-
-  const loggedOutView = (
-    <>
-      <h3>logo</h3>
-      <h1>Slyde</h1>
-      <div className="card">
-        <Button
-          variant='contained'
-          fullWidth={true}
-          onClick={() => loginWithGoogle()}
-        >Login with Google</Button>
-      </div>
-    </>
-  );
-
-  const loggedInProps = {
-    provider,
-    web3auth,
-    logoutFn:logout
-  }
-
-  const ConditionalComponent = ({ ...props }) => (
-    loggedIn ? <LoggedIn {...props} /> : loggedOutView
-  );
   
 
   return (
-    <ThemeProvider theme={theme}>
-      <div>{ConditionalComponent({ ...loggedInProps})}</div>
-    </ThemeProvider>
-  )
+      <>
+        <ConditionalComponent { ...loggedInProps} />
+      </>
+  );
 }
 
 export default App
