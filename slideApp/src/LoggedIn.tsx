@@ -12,7 +12,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 
 function LoggedIn() {
-    const { user, currentPage } = useUser();    
+    const { user, currentPage } = useUser();
 
     const PageSwitcher = () => {
         if (user != null && user.sns != null) {

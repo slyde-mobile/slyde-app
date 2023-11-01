@@ -31,8 +31,8 @@ function Dashboard() {
         const rpc = new RPC(web3Auth.provider);
         const txn = await rpc.generateUSDCSendTransaction(
             new PublicKey(user.account),
-            new PublicKey("B4dvdm1V5PipGHuwyM7u7ePeCftvk2DsxRa2jVG1iKTy"),
-            100000
+            new PublicKey('B4dvdm1V5PipGHuwyM7u7ePeCftvk2DsxRa2jVG1iKTy'),
+            100000,
         );
         console.log('txn', txn);
         const signedTxn = await rpc.signTransaction(txn);
@@ -42,9 +42,11 @@ function Dashboard() {
         const handleSignTransaction = async () => {
             const response = await signTransaction({
                 variables: {
-                    serializedTransaction: Array.from(signedTxn.serialize({
-                        requireAllSignatures: false,
-                    })),
+                    serializedTransaction: Array.from(
+                        signedTxn.serialize({
+                            requireAllSignatures: false,
+                        }),
+                    ),
                 },
             });
             console.log(response.data.signTransaction);
