@@ -1,11 +1,10 @@
-import { defineConfig } from 'vite'
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
-import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill'
-import rollupNodePolyFill from 'rollup-plugin-polyfill-node'
-import react from '@vitejs/plugin-react-swc'
+import { defineConfig } from 'vite';
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
+import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill';
+import rollupNodePolyFill from 'rollup-plugin-polyfill-node';
+import react from '@vitejs/plugin-react-swc';
 import { VitePWA } from 'vite-plugin-pwa';
-import basicSsl from '@vitejs/plugin-basic-ssl'
-
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,8 +12,8 @@ export default defineConfig({
         react(),
         basicSsl(),
         VitePWA({
-            injectRegister: "auto",
-            registerType: "autoUpdate",
+            injectRegister: 'auto',
+            registerType: 'autoUpdate',
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
             },
@@ -28,39 +27,37 @@ export default defineConfig({
                         src: 'slyde-logo.png',
                         sizes: '192x192',
                         type: 'image/png',
-                    }
+                    },
                 ],
             },
             devOptions: {
                 enabled: false,
                 type: 'module',
             },
-        })
+        }),
     ],
     optimizeDeps: {
         esbuildOptions: {
             // Node.js global to browser globalThis
             define: {
-                global: 'globalThis'
+                global: 'globalThis',
             },
             // Enable esbuild polyfill plugins
             plugins: [
                 NodeGlobalsPolyfillPlugin({
                     process: true,
-                    buffer: true
+                    buffer: true,
                 }),
-                NodeModulesPolyfillPlugin()
-            ]}
-        }, 
-        server: {
-            https: true
+                NodeModulesPolyfillPlugin(),
+            ],
         },
-        build: {
-            rollupOptions: {
-                plugins: [
-                rollupNodePolyFill({ include: null })
-                ]
-            }
-        }
-    }
-)
+    },
+    server: {
+        https: true,
+    },
+    build: {
+        rollupOptions: {
+            plugins: [rollupNodePolyFill({ include: null })],
+        },
+    },
+});

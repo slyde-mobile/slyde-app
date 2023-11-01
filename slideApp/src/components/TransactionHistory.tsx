@@ -14,34 +14,38 @@ interface Transaction {
     amount: string;
     uiAmount: number;
     createdAt: string;
+    signature: string;
 }
 
 interface TransactionHistoryResponse {
     userTransactionHistory: Transaction[];
 }
 
-
 const GET_USER_TRANSACTION_HISTORY = gql`
-query UserTransactionHistory($account: String) {
-    userTransactionHistory(account: $account) {
-      from
-      to
-      amount
-      uiAmount
-      createdAt
+    query UserTransactionHistory($account: String) {
+        userTransactionHistory(account: $account) {
+            from
+            to
+            amount
+            uiAmount
+            createdAt
+            signature
+        }
     }
-  }`;
-
+`;
 
 function TransactionHistory() {
     const { user } = useUser();
     console.log('user', user);
     if (user == null) {
-        return (<></>);
+        return <></>;
     }
-    const { loading, error, data } = useQuery<TransactionHistoryResponse, any>(GET_USER_TRANSACTION_HISTORY, {
-        variables: { account: user.account },
-    });
+    const { loading, error, data } = useQuery<TransactionHistoryResponse, any>(
+        GET_USER_TRANSACTION_HISTORY,
+        {
+            variables: { account: user.account },
+        },
+    );
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error :(</p>;
     if (!data) return <p>...</p>;
@@ -49,15 +53,20 @@ function TransactionHistory() {
     return (
         <List>
             {data.userTransactionHistory.map((transaction: Transaction) => (
-            <>
-                <ListItem>
-                    <ListItemText primary="Received USD" secondary={`$${transaction.uiAmount}`} />
-                    <Typography variant="caption">{transaction.from}</Typography>
-                </ListItem>
-                <Divider component="li" />                
-            </>
+                <>
+                    <ListItem key={transaction.signature}>
+                        <ListItemText
+                            primary="Received USD"
+                            secondary={`$${transaction.uiAmount}`}
+                        />
+                        <Typography variant="caption">
+                            {transaction.from}
+                        </Typography>
+                    </ListItem>
+                    <Divider component="li" />
+                </>
             ))}
         </List>
     );
-};
+}
 export default TransactionHistory;

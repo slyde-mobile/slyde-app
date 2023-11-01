@@ -1,39 +1,39 @@
-import ChooseUsername from "./ChooseUsername";
-import Dashboard from "./Dashboard";
-import { useUser } from "./providers/UserProvider";
+import ChooseUsername from './ChooseUsername';
+import Dashboard from './Dashboard';
+import { useUser } from './providers/UserProvider';
 import {
     AppBar,
     Toolbar,
     Typography,
     Button,
-    Container, 
+    Container,
     IconButton,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import React from "react";
 
 function LoggedIn() {
-    const { user } = useUser();
-    const [currentPage, setCurrentPage] = React.useState<string>('dashboard');
+    const { user, currentPage } = useUser();    
 
     const PageSwitcher = () => {
         if (user != null && user.sns != null) {
             switch (currentPage) {
                 case 'send':
-                    return (<></>);
+                    return <></>;
                 default:
-                    return (
-                        <Dashboard setCurrentPage={setCurrentPage} />
-                    );
-            }            
+                    return <Dashboard />;
+            }
         }
-        return (
-            <ChooseUsername />
-        )
+        return <ChooseUsername />;
     };
 
     return (
-        <Container style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Container
+            style={{
+                height: '100vh',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
             <AppBar position="static">
                 <Toolbar>
                     <IconButton
@@ -45,7 +45,12 @@ function LoggedIn() {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" component="div" color="secondary" sx={{ flexGrow: 1 }}>
+                    <Typography
+                        variant="h6"
+                        component="div"
+                        color="secondary"
+                        sx={{ flexGrow: 1 }}
+                    >
                         Slyde
                     </Typography>
                     <Button color="inherit">Logout</Button>
@@ -53,10 +58,8 @@ function LoggedIn() {
             </AppBar>
 
             <PageSwitcher />
-
         </Container>
-
-    )
+    );
 }
 
 export default LoggedIn;
