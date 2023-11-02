@@ -16,14 +16,10 @@ interface CreateUserResponse {
 
 const CREATE_USER = gql`
     mutation CreateUser(
-        $idToken: String
-        $web3AuthPublicKey: String
         $account: String
         $emailAddress: String!
     ) {
         createUser(
-            idToken: $idToken
-            web3AuthPublicKey: $web3AuthPublicKey
             account: $account
             emailAddress: $emailAddress
         ) {
@@ -42,7 +38,6 @@ function App() {
         web3User,
         loggedIn,
         account,
-        web3AuthKey,
         setUser,
         setWeb3User,
         setLoggedIn,
@@ -62,8 +57,6 @@ function App() {
         const ret = await apolloClient.mutate<CreateUserResponse>({
             mutation: CREATE_USER,
             variables: {
-                idToken: web3User.idToken,
-                web3AuthPublicKey: web3AuthKey,
                 account,
                 emailAddress: web3User.email,
                 name: web3User.name,
