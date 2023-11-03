@@ -1,5 +1,5 @@
-import ChooseUsername from './ChooseUsername';
-import Dashboard from './Dashboard';
+import ChooseUsername from './pages/ChooseUsername';
+import Dashboard from './pages/Dashboard';
 import { useUser } from './providers/UserProvider';
 import {
     AppBar,
@@ -8,22 +8,47 @@ import {
     Button,
     Container,
     IconButton,
+    Snackbar,
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SendPrompt from './pages/Send';
+
+function MenuIconSwitcher(props: { currentPage: string }) {
+    switch (props.currentPage) {
+        case 'send':
+            return <ArrowBackIcon />;
+        default:
+            return <></>;
+    }
+}
 
 function LoggedIn() {
-    const { user, currentPage } = useUser();
+    const {
+        user,
+        currentPage,
+        setCurrentPage,
+        processingTransactionState,
+        setProcessingTransactionState,
+    } = useUser();
+
+    const handleBackClick = () => {
+        setCurrentPage('dashboard');
+    };
 
     const PageSwitcher = () => {
         if (user != null && user.sns != null) {
             switch (currentPage) {
                 case 'send':
-                    return <></>;
+                    return <SendPrompt />;
                 default:
                     return <Dashboard />;
             }
         }
         return <ChooseUsername />;
+    };
+
+    const hideToast = () => {
+        setProcessingTransactionState('not_started');
     };
 
     return (
@@ -42,8 +67,11 @@ function LoggedIn() {
                         color="inherit"
                         aria-label="menu"
                         sx={{ mr: 2 }}
+                        onClick={
+                            currentPage === 'send' ? handleBackClick : undefined
+                        }
                     >
-                        <MenuIcon />
+                        <MenuIconSwitcher currentPage={currentPage} />
                     </IconButton>
                     <Typography
                         variant="h6"
@@ -58,6 +86,17 @@ function LoggedIn() {
             </AppBar>
 
             <PageSwitcher />
+            {processingTransactionState === 'processing' && (
+                <Snackbar open={true} message="Processing Transaction" />
+            )}
+            {processingTransactionState === 'completed' && (
+                <Snackbar
+                    open={true}
+                    onClose={hideToast}
+                    autoHideDuration={6000}
+                    message="Completed Transaction"
+                />
+            )}
         </Container>
     );
 }

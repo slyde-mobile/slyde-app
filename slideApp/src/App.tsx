@@ -15,14 +15,8 @@ interface CreateUserResponse {
 }
 
 const CREATE_USER = gql`
-    mutation CreateUser(
-        $account: String
-        $emailAddress: String!
-    ) {
-        createUser(
-            account: $account
-            emailAddress: $emailAddress
-        ) {
+    mutation CreateUser($account: String, $emailAddress: String!) {
+        createUser(account: $account, emailAddress: $emailAddress) {
             account
             sns
         }
@@ -38,6 +32,7 @@ function App() {
         web3User,
         loggedIn,
         account,
+        appReady,
         setUser,
         setWeb3User,
         setLoggedIn,
@@ -49,11 +44,10 @@ function App() {
         useContext(ApolloContext);
     const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
 
-    const createOrLoginUser = async () => {
+    const createOrLoginUser = async (account: string) => {
         if (account == '' || apolloClient == null || web3User == null) {
             return;
         }
-
         const ret = await apolloClient.mutate<CreateUserResponse>({
             mutation: CREATE_USER,
             variables: {
@@ -77,7 +71,7 @@ function App() {
             //    c. Web3Auth call: Get the solana addresses from the user
             //    d. Graphql: Get the user from the server. We can see if this user exists, or create one if they don't.
             if (
-                web3Auth != null &&
+                web3Auth &&
                 !web3authInitialized &&
                 web3Auth.status == ADAPTER_STATUS.NOT_READY
             ) {
@@ -92,21 +86,31 @@ function App() {
 
                 const userInfo = await web3Auth.getUserInfo();
                 setWeb3User(userInfo);
-
-                if (account == '') {
-                    const rpc = new RPC(web3Auth.provider);
-                    const accounts = await rpc.getAccounts();
-                    setAccount(accounts[0]);
-                } else {
-                    await createOrLoginUser();
-                    setLoggedIn(true);
-                    setLoading(false);
-                }
             }
         };
         init();
-    }, [web3Auth, loggedIn, account, web3User, web3authInitialized]);
+    }, [web3Auth, web3authInitialized]);
 
+    useEffect(() => {
+        const initUser = async () => {
+            if (
+                web3User &&
+                web3Auth &&
+                web3Auth.connected &&
+                web3Auth.provider &&
+                account == ''
+            ) {
+                const rpc = new RPC(web3Auth.provider);
+                const accounts = await rpc.getAccounts();
+                setAccount(accounts[0]);
+
+                await createOrLoginUser(accounts[0]);
+                setLoggedIn(true);
+                setLoading(false);
+            }
+        };
+        initUser();
+    }, [web3User]);
     // const logout = async () => {
     //   if (!web3Auth) {
     //     return;
@@ -122,7 +126,11 @@ function App() {
         if (loading) {
             return <div>Loading...</div>;
         }
-        return loggedIn ? <LoggedIn {...props} /> : <LoggedOut {...props} />;
+        return loggedIn && appReady ? (
+            <LoggedIn {...props} />
+        ) : (
+            <LoggedOut {...props} />
+        );
     };
 
     return (

@@ -1,11 +1,17 @@
 import React, { createContext } from 'react';
 import { OpenloginUserInfo } from '@web3auth/openlogin-adapter';
+import { WalletBallance } from '../components/Balance';
 
 export interface User {
     account: string;
     sns: string | null;
     email_address: string | null;
     last_login: Date;
+}
+
+export interface UpdateAppReady {
+    clientsInitialized: boolean;
+    authTokensReady: boolean;
 }
 
 interface UserContextProps {
@@ -16,6 +22,9 @@ interface UserContextProps {
 
     user: User | null;
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
+
+    userBalance: WalletBallance | null;
+    setUserBalance: React.Dispatch<React.SetStateAction<WalletBallance | null>>;
 
     loggedIn: boolean;
     setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,6 +37,14 @@ interface UserContextProps {
 
     currentPage: string;
     setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
+
+    appReady: boolean;
+    setAppReady: React.Dispatch<React.SetStateAction<boolean>>;
+
+    processingTransactionState: string;
+    setProcessingTransactionState: React.Dispatch<React.SetStateAction<string>>;
+
+    updateAppReady: (update: UpdateAppReady) => void;
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -39,9 +56,30 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({
     const [web3User, setWeb3User] =
         React.useState<Partial<OpenloginUserInfo> | null>(null);
     const [loggedIn, setLoggedIn] = React.useState<boolean>(false);
+    const [appReady, setAppReady] = React.useState<boolean>(false);
+    const [processingTransactionState, setProcessingTransactionState] =
+        React.useState<string>('not_started');
     const [account, setAccount] = React.useState<string>('');
     const [web3AuthKey, setWeb3AuthKey] = React.useState<string>('');
     const [currentPage, setCurrentPage] = React.useState<string>('dashboard');
+    const [userBalance, setUserBalance] = React.useState<WalletBallance | null>(
+        null,
+    );
+
+    const updateAppReady = ({
+        clientsInitialized,
+        authTokensReady,
+    }: UpdateAppReady) => {
+        console.log(
+            'updateAppReady',
+            clientsInitialized,
+            authTokensReady,
+            loggedIn,
+        );
+        if (loggedIn && clientsInitialized && authTokensReady) {
+            setAppReady(true);
+        }
+    };
     return (
         <UserContext.Provider
             value={{
@@ -51,12 +89,19 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({
                 account,
                 web3AuthKey,
                 currentPage,
+                appReady,
+                userBalance,
+                processingTransactionState,
+                updateAppReady,
                 setUser,
                 setWeb3User,
                 setLoggedIn,
                 setAccount,
                 setWeb3AuthKey,
                 setCurrentPage,
+                setAppReady,
+                setUserBalance,
+                setProcessingTransactionState,
             }}
         >
             {children}

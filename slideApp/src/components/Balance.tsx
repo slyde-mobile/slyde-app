@@ -1,8 +1,9 @@
 import { gql, useQuery } from '@apollo/client';
 import { useUser } from '../providers/UserProvider';
 import { Typography } from '@mui/material';
+import { useEffect } from 'react';
 
-interface WalletBallance {
+export interface WalletBallance {
     account: string;
     amount: string;
     decimals: number;
@@ -25,16 +26,23 @@ const GET_USER_WALLET_BALANCE = gql`
 `;
 
 function Balance() {
-    const { user } = useUser();
+    const { user, setUserBalance } = useUser();
     if (user == null) {
         return <></>;
     }
+
     const { loading, error, data } = useQuery<WalletBalanceResponse, any>(
         GET_USER_WALLET_BALANCE,
         {
             variables: { account: user.account },
         },
     );
+
+    useEffect(() => {
+        if (data) {
+            setUserBalance(data.userWalletBalance);
+        }
+    }, [data]);
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error :(</p>;

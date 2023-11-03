@@ -34,16 +34,6 @@ function LoggedIn(props: any) {
         uiConsole(address);
     };
 
-    const getBalance = async () => {
-        if (!provider) {
-            uiConsole('provider not initialized yet');
-            return;
-        }
-        const rpc = new RPC(provider);
-        const balance = await rpc.getBalance();
-        uiConsole(balance);
-    };
-
     const sendTransaction = async () => {
         if (!provider) {
             uiConsole('provider not initialized yet');
@@ -90,11 +80,6 @@ function LoggedIn(props: any) {
                 <div>
                     <button onClick={getAccounts} className="card">
                         Get Accounts
-                    </button>
-                </div>
-                <div>
-                    <button onClick={getBalance} className="card">
-                        Get Balance
                     </button>
                 </div>
                 <div>

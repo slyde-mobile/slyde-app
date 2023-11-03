@@ -12,8 +12,8 @@ import {
     NormalizedCacheObject,
     gql,
 } from '@apollo/client';
-import { ApolloContext } from './providers/ClientsProvider';
-import { User, useUser } from './providers/UserProvider';
+import { ApolloContext } from '../providers/ClientsProvider';
+import { User, useUser } from '../providers/UserProvider';
 
 interface ClaimUsernameResponse {
     claimUsername: User;

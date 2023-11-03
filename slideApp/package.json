@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.8.6",
-    "@bonfida/spl-name-service": "^1.5.0",
+    "@bonfida/spl-name-service": "^2.0.0-alpha.18",
     "@emotion/core": "^11.0.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
@@ -32,6 +32,7 @@
     "@web3auth/no-modal": "^7.0.4",
     "@web3auth/openlogin-adapter": "^7.0.4",
     "@web3auth/solana-provider": "^7.0.4",
+    "add": "^2.0.6",
     "axios": "^1.5.1",
     "bn.js": "^5.2.1",
     "graphql": "^16.8.1",
@@ -40,7 +41,8 @@
     "react-dom": "^18.2.0",
     "rollup-plugin-polyfill-node": "^0.12.0",
     "styled-components": "^6.0.9",
-    "vite-plugin-pwa": "^0.16.5"
+    "vite-plugin-pwa": "^0.16.5",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.3",

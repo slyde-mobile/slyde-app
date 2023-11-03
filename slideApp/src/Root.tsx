@@ -19,14 +19,14 @@ function Root() {
 
     return (
         <ThemeProvider theme={theme}>
-            <ClientsProvider
-                onConnecting={onConnecting}
-                onConnected={onConnected}
-            >
-                <UserProvider>
+            <UserProvider>
+                <ClientsProvider
+                    onConnecting={onConnecting}
+                    onConnected={onConnected}
+                >
                     <App />
-                </UserProvider>
-            </ClientsProvider>
+                </ClientsProvider>
+            </UserProvider>
         </ThemeProvider>
     );
 }
