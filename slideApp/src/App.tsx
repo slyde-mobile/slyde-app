@@ -3,12 +3,13 @@ import { getWeb3AuthPublicKey } from './util/util';
 import RPC from './util/solanaRPC';
 import { Web3AuthNoModal } from '@web3auth/no-modal';
 import { ADAPTER_STATUS } from '@web3auth/base';
-import LoggedIn from './LoggedIn';
-import LoggedOut from './LoggedOut';
+import LoggedIn from './pages/LoggedIn';
+import LoggedOut from './pages/LoggedOut';
 import { ApolloClient, NormalizedCacheObject, gql } from '@apollo/client';
 import './App.css';
 import { ApolloContext, Web3AuthContext } from './providers/ClientsProvider';
 import { User, useUser } from './providers/UserProvider';
+import AppLoading from './pages/AppLoading';
 
 interface CreateUserResponse {
     createUser: User;
@@ -24,7 +25,7 @@ const CREATE_USER = gql`
 `;
 
 function App() {
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [web3authInitialized, setWeb3authInitialized] =
         useState<boolean>(false);
 
@@ -106,25 +107,19 @@ function App() {
 
                 await createOrLoginUser(accounts[0]);
                 setLoggedIn(true);
-                setLoading(false);
+                setTimeout(() => {
+                    setLoading(false);
+                }, 2000);
             }
         };
         initUser();
     }, [web3User]);
-    // const logout = async () => {
-    //   if (!web3Auth) {
-    //     return;
-    //   }
-    //   await web3Auth.logout();
-    //   setLoggedIn(false);
-    //   setLoading(false);
-    // };
 
     const loggedInProps = {};
 
     const ConditionalComponent = ({ ...props }) => {
         if (loading) {
-            return <div>Loading...</div>;
+            return <AppLoading />;
         }
         return loggedIn && appReady ? (
             <LoggedIn {...props} />

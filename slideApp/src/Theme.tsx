@@ -11,7 +11,7 @@ const Theme = createTheme({
             main: '#f2b842',
         },
         background: {
-            default: '#813ef9',
+            default: '#0e1848',
         },
         error: {
             main: '#ff0000',
@@ -30,11 +30,11 @@ const Theme = createTheme({
             styleOverrides: {
                 root: {
                     backgroundColor: '#f2b842',
-                    borderColor: '#2d2d2d',
+                    borderColor: '#cc9900',
                     borderWidth: '1px',
                     borderStyle: 'solid',
                     borderRadius: 0,
-                    padding: 0,
+                    padding: '5px 20px',
                     '&:hover': {
                         backgroundColor: '#d9a534', // A slightly darker shade when hovered
                     },
@@ -44,7 +44,8 @@ const Theme = createTheme({
         MuiAppBar: {
             styleOverrides: {
                 root: {
-                    backgroundColor: '#813ef9',
+                    backgroundColor: '#0e1848',
+                    boxShadow: 'none',
                 },
             },
         },

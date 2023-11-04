@@ -21,7 +21,7 @@ export default defineConfig({
                 name: 'Slyde',
                 short_name: 'Slyde',
                 description: 'Do you even slyde crypto?',
-                theme_color: '#813ef9',
+                theme_color: '#0e1848',
                 icons: [
                     {
                         src: 'slyde-logo.png',

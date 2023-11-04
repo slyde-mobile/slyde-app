@@ -1,8 +1,9 @@
 import { useContext } from 'react';
-import { Button } from '@mui/material';
-import { Web3AuthContext } from './providers/ClientsProvider';
+import { Web3AuthContext } from '../providers/ClientsProvider';
 import { Web3AuthNoModal } from '@web3auth/no-modal';
 import { WALLET_ADAPTERS } from '@web3auth/base';
+import AppLogo from '../components/AppLogo';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 const LoggedOut = () => {
     const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
@@ -17,19 +18,21 @@ const LoggedOut = () => {
     };
 
     return (
-        <>
-            <h3>logo</h3>
+        <div
+            style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+                height: '100vh', // vh stands for viewport height units
+            }}
+        >
+            <AppLogo />
             <h1>Slyde</h1>
             <div className="card">
-                <Button
-                    variant="contained"
-                    fullWidth={true}
-                    onClick={() => loginWithGoogle()}
-                >
-                    Login with Google
-                </Button>
+                <GoogleLoginButton onClick={() => loginWithGoogle()} />
             </div>
-        </>
+        </div>
     );
 };
 

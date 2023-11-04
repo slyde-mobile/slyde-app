@@ -77,7 +77,10 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({
             loggedIn,
         );
         if (loggedIn && clientsInitialized && authTokensReady) {
-            setAppReady(true);
+            console.log('app ready?');
+            setTimeout(() => {
+                setAppReady(true);
+            }, 1000);
         }
     };
     return (
