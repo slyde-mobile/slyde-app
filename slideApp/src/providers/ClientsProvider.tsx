@@ -53,7 +53,8 @@ export const ClientsProvider: React.FC<
 > = ({ children, onConnecting, onConnected }) => {
     const [state, dispatch] = useReducer(clientsReducer, {});
     const initializedRef = React.useRef<boolean>(false);
-    const { web3AuthKey, web3User, updateAppReady, loggedIn } = useUser();
+    const { web3AuthKey, web3User, updateAppReady, loggedIn, setLoggedIn } =
+        useUser();
 
     const httpLink = new HttpLink({
         uri: 'http://127.0.0.1:8080/graphql',
@@ -71,6 +72,7 @@ export const ClientsProvider: React.FC<
                 const web3Auth = createWeb3Auth();
                 web3Auth.on(ADAPTER_EVENTS.CONNECTED, async () => {
                     onConnected();
+                    setLoggedIn(true);
                 });
                 web3Auth.on(ADAPTER_EVENTS.CONNECTING, () => {
                     onConnecting();

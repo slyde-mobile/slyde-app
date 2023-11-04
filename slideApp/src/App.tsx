@@ -10,6 +10,8 @@ import './App.css';
 import { ApolloContext, Web3AuthContext } from './providers/ClientsProvider';
 import { User, useUser } from './providers/UserProvider';
 import AppLoading from './pages/AppLoading';
+import { AnimatePresence, motion } from 'framer-motion';
+import React from 'react';
 
 interface CreateUserResponse {
     createUser: User;
@@ -87,10 +89,17 @@ function App() {
 
                 const userInfo = await web3Auth.getUserInfo();
                 setWeb3User(userInfo);
+            } else if (
+                web3Auth != null &&
+                !web3Auth.connected &&
+                web3Auth.status == ADAPTER_STATUS.READY
+            ) {
+                setWeb3authInitialized(true);
+                setLoading(false);
             }
         };
         init();
-    }, [web3Auth, web3authInitialized]);
+    }, [web3Auth, web3authInitialized, loggedIn]);
 
     useEffect(() => {
         const initUser = async () => {
@@ -106,10 +115,13 @@ function App() {
                 setAccount(accounts[0]);
 
                 await createOrLoginUser(accounts[0]);
-                setLoggedIn(true);
-                setTimeout(() => {
+                if (!loggedIn) {
+                    setLoggedIn(true);
+                }
+                if (loading) {
                     setLoading(false);
-                }, 2000);
+                }
+                console.log('User logged in');
             }
         };
         initUser();
@@ -118,13 +130,51 @@ function App() {
     const loggedInProps = {};
 
     const ConditionalComponent = ({ ...props }) => {
-        if (loading) {
-            return <AppLoading />;
-        }
-        return loggedIn && appReady ? (
-            <LoggedIn {...props} />
-        ) : (
-            <LoggedOut {...props} />
+        const [showLoading, setShowLoading] = React.useState<boolean>(true); // This is the state that will be used to show the loading screen
+
+        useEffect(() => {
+            if (!loading && showLoading) {
+                const timeoutId = setTimeout(() => {
+                    if (showLoading) {
+                        setShowLoading(false);
+                    }
+                }, 2000); // Set showLoading to false after 2 seconds
+
+                return () => clearTimeout(timeoutId); // Clear the timeout if the component unmounts
+            }
+        }, [loading]);
+
+        return (
+            <AnimatePresence mode="wait">
+                {showLoading ? (
+                    <motion.div
+                        initial={{ opacity: 1, y: 0 }}
+                        key="loading"
+                        exit={{
+                            y: '-100%',
+                            transition: {
+                                delay: 2, // Delay the slide up for 2 seconds
+                                duration: 0.5,
+                            },
+                        }}
+                    >
+                        <AppLoading />
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        key="content"
+                    >
+                        {loggedIn && appReady ? (
+                            <LoggedIn {...props} />
+                        ) : (
+                            <LoggedOut {...props} />
+                        )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         );
     };
 

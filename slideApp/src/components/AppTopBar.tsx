@@ -8,7 +8,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Web3AuthContext } from '../providers/ClientsProvider';
 
 function AppTopBar() {
-    const { currentPage, setCurrentPage } = useUser();
+    const { currentPage, setCurrentPage, setLoggedIn } = useUser();
     const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
 
     const [showSlydeText, setShowSlydeText] = useState(true);
@@ -44,6 +44,7 @@ function AppTopBar() {
             return;
         }
         await web3Auth.logout();
+        setLoggedIn(false);
     };
 
     return (
