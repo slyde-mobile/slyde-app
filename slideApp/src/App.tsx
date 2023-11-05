@@ -148,13 +148,16 @@ function App() {
             <AnimatePresence mode="wait">
                 {showLoading ? (
                     <motion.div
-                        initial={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 1, x: 0 }}
                         key="loading"
+                        style={{
+                            zIndex: 1,
+                        }}
                         exit={{
-                            y: '-100%',
+                            x: '-100%',
                             transition: {
-                                delay: 2, // Delay the slide up for 2 seconds
-                                duration: 0.5,
+                                delay: 1, // Delay the slide up for 2 seconds
+                                duration: 0.3,
                             },
                         }}
                     >
@@ -164,7 +167,7 @@ function App() {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 0.1 }}
                         key="content"
                     >
                         {loggedIn && appReady ? (
