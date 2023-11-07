@@ -23,6 +23,7 @@
     "@mui/icons-material": "^5.14.16",
     "@mui/material": "^5.14.13",
     "@mui/styled-engine-sc": "^6.0.0-alpha.1",
+    "@mui/system": "^5.14.17",
     "@solana/web3.js": "^1.87.1",
     "@toruslabs/eccrypto": "^4.0.0",
     "@toruslabs/openlogin-ed25519": "^5.0.0",

@@ -11,7 +11,6 @@ import { ApolloContext, Web3AuthContext } from './providers/ClientsProvider';
 import { User, useUser } from './providers/UserProvider';
 import AppLoading from './pages/AppLoading';
 import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
 
 interface CreateUserResponse {
     createUser: User;
@@ -36,11 +35,13 @@ function App() {
         loggedIn,
         account,
         appReady,
+        appLoading,
         setUser,
         setWeb3User,
         setLoggedIn,
         setAccount,
         setWeb3AuthKey,
+        setAppLoading,
     } = useUser();
 
     const apolloClient: ApolloClient<NormalizedCacheObject> | undefined =
@@ -130,13 +131,11 @@ function App() {
     const loggedInProps = {};
 
     const ConditionalComponent = ({ ...props }) => {
-        const [showLoading, setShowLoading] = React.useState<boolean>(true); // This is the state that will be used to show the loading screen
-
         useEffect(() => {
-            if (!loading && showLoading) {
+            if (!loading && setAppLoading) {
                 const timeoutId = setTimeout(() => {
-                    if (showLoading) {
-                        setShowLoading(false);
+                    if (setAppLoading) {
+                        setAppLoading(false);
                     }
                 }, 2000); // Set showLoading to false after 2 seconds
 
@@ -146,7 +145,7 @@ function App() {
 
         return (
             <AnimatePresence mode="wait">
-                {showLoading ? (
+                {appLoading ? (
                     <motion.div
                         initial={{ opacity: 1, x: 0 }}
                         key="loading"
@@ -156,7 +155,7 @@ function App() {
                         exit={{
                             x: '-100%',
                             transition: {
-                                delay: 1, // Delay the slide up for 2 seconds
+                                delay: 1,
                                 duration: 0.3,
                             },
                         }}
@@ -167,7 +166,7 @@ function App() {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 0.1 }}
+                        transition={{ duration: 0.2 }}
                         key="content"
                     >
                         {loggedIn && appReady ? (

@@ -20,18 +20,8 @@ interface ClaimUsernameResponse {
 }
 
 const CLAIM_USERNAME = gql`
-    mutation ClaimUsername(
-        $idToken: String
-        $web3AuthPublicKey: String
-        $account: String
-        $sns: String
-    ) {
-        claimUsername(
-            idToken: $idToken
-            web3AuthPublicKey: $web3AuthPublicKey
-            account: $account
-            sns: $sns
-        ) {
+    mutation ClaimUsername($account: String, $sns: String) {
+        claimUsername(account: $account, sns: $sns) {
             account
             sns
         }
@@ -61,8 +51,6 @@ function ChooseUsername() {
                 const ret = await apolloClient.mutate<ClaimUsernameResponse>({
                     mutation: CLAIM_USERNAME,
                     variables: {
-                        idToken: web3User.idToken,
-                        web3AuthPublicKey: web3AuthKey,
                         account,
                         sns: inputValue.trim(),
                     },
@@ -84,9 +72,7 @@ function ChooseUsername() {
     }
 
     return (
-        <>
-            <h3>logo</h3>
-            <h1>Slyde</h1>
+        <div style={{ marginTop: '64px' }}>
             <div style={{ padding: '20px' }}>
                 <div
                     style={{
@@ -142,7 +128,7 @@ function ChooseUsername() {
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 }
 

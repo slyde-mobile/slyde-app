@@ -41,6 +41,30 @@ const GET_USER_TRANSACTION_HISTORY = gql`
     }
 `;
 
+function formatDate(date: Date) {
+    const dateString = date.toLocaleDateString('en-US', {
+        year: '2-digit',
+        month: 'short',
+        day: 'numeric',
+    });
+    const timeString = date
+        .toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+        })
+        .toLowerCase();
+
+    return `${dateString}, ${timeString}`;
+}
+
+function formatAccount(account: string) {
+    return `${account.substring(0, 5)}...${account.substring(
+        account.length - 5,
+        account.length,
+    )}`;
+}
+
 function TransactionHistory() {
     const { user, processingTransactionState } = useUser();
 
@@ -79,8 +103,16 @@ function TransactionHistory() {
                 <React.Fragment key={transaction.signature}>
                     <ListItem>
                         <div style={{ flex: 1 }}>
-                            <Typography variant="h5">
-                                ${transaction.instructions[0].uiAmountString}
+                            <Typography variant="body2">
+                                {formatDate(new Date(transaction.createdAt))}
+                            </Typography>
+                            <Typography variant="body2">
+                                from{' '}
+                                {formatAccount(
+                                    transaction.instructions[0].from,
+                                )}{' '}
+                                to{' '}
+                                {formatAccount(transaction.instructions[0].to)}
                             </Typography>
                             {transaction.instructions[1] && (
                                 <Typography variant="body2">
@@ -89,7 +121,24 @@ function TransactionHistory() {
                                 </Typography>
                             )}
                         </div>
-                        <div>
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Typography
+                                variant="h6"
+                                color={
+                                    transaction.instructions[0]?.direction ===
+                                    'received'
+                                        ? 'success'
+                                        : 'error'
+                                }
+                            >
+                                ${transaction.instructions[0].uiAmountString}
+                            </Typography>
                             <IconButton
                                 color={
                                     transaction.instructions[0]?.direction ===
@@ -105,11 +154,6 @@ function TransactionHistory() {
                                     <ArrowRightwardIcon />
                                 )}
                             </IconButton>
-                            <Typography variant="body2" align="right">
-                                {new Date(
-                                    transaction.createdAt,
-                                ).toLocaleString()}
-                            </Typography>
                         </div>
                     </ListItem>
                     <Divider component="li" />

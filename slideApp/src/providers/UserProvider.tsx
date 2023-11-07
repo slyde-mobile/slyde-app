@@ -45,6 +45,9 @@ interface UserContextProps {
     setProcessingTransactionState: React.Dispatch<React.SetStateAction<string>>;
 
     updateAppReady: (update: UpdateAppReady) => void;
+
+    appLoading: boolean;
+    setAppLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -65,6 +68,7 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({
     const [userBalance, setUserBalance] = React.useState<WalletBallance | null>(
         null,
     );
+    const [appLoading, setAppLoading] = React.useState<boolean>(true);
 
     const updateAppReady = ({
         clientsInitialized,
@@ -88,6 +92,8 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({
                 appReady,
                 userBalance,
                 processingTransactionState,
+                appLoading,
+                setAppLoading,
                 updateAppReady,
                 setUser,
                 setWeb3User,

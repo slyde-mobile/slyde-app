@@ -49,8 +49,8 @@ function Balance() {
     if (!data) return <p>...</p>;
 
     return (
-        <Typography variant="h3" style={{ marginTop: 16 }}>
-            ${data.userWalletBalance.uiAmountString} USDC
+        <Typography variant="h3" align="left">
+            ${data.userWalletBalance.uiAmountString}
         </Typography>
     );
 }

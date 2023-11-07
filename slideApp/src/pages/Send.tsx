@@ -15,8 +15,11 @@ import { PublicKey } from '@solana/web3.js';
 import { gql, useMutation } from '@apollo/client';
 
 const SIGN_TRANSACTION = gql`
-    mutation SendMoney($serializedTransaction: [Int!]!) {
-        sendMoney(serializedTransaction: $serializedTransaction) {
+    mutation SendMoney($serializedTransaction: [Int!]!, $blockHash: String!) {
+        sendMoney(
+            serializedTransaction: $serializedTransaction
+            blockHash: $blockHash
+        ) {
             signature
         }
     }
@@ -66,7 +69,7 @@ function SendPrompt() {
         }
 
         // Convert to cents (assuming user inputs dollars)
-        const amountInCents = Math.round(amount * 100000);
+        const amountInCents = Math.round(amount * 1000000);
         const userBalanceInCents = parseInt(userBalance.amount, 10);
 
         if (amountInCents > userBalanceInCents) {
@@ -97,7 +100,7 @@ function SendPrompt() {
         const txn = await rpc.generateUSDCSendTransaction(
             new PublicKey(user.account),
             subdomainAccount,
-            100000,
+            amountInCents,
         );
 
         const signedTxn = await rpc.signTransaction(txn);
@@ -112,6 +115,7 @@ function SendPrompt() {
                             requireAllSignatures: false,
                         }),
                     ),
+                    blockHash: signedTxn.recentBlockhash,
                 },
             });
             console.log(response.data.signTransaction);
@@ -122,9 +126,7 @@ function SendPrompt() {
     };
 
     return (
-        <>
-            <h3>logo</h3>
-            <h1>Slyde</h1>
+        <div style={{ marginTop: '64px' }}>
             <div style={{ padding: '20px' }}>
                 <div
                     style={{
@@ -228,7 +230,7 @@ function SendPrompt() {
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 }
 

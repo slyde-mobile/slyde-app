@@ -1,4 +1,4 @@
-import { AppBar, Toolbar, Typography, Button, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
 import { motion } from 'framer-motion';
 
 import { useUser } from '../providers/UserProvider';
@@ -6,6 +6,7 @@ import AppTopBarIcon from './AppTopBarIcon';
 import { Web3AuthNoModal } from '@web3auth/no-modal';
 import { useContext, useEffect, useState } from 'react';
 import { Web3AuthContext } from '../providers/ClientsProvider';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 function AppTopBar() {
     const { currentPage, setCurrentPage, setLoggedIn } = useUser();
@@ -49,14 +50,14 @@ function AppTopBar() {
 
     return (
         <AppBar position="fixed">
-            <Toolbar>
-                <div style={{ flex: 1, textAlign: 'left' }}>
+            <Toolbar style={{ padding: '0' }}>
+                <div style={{ flex: 1, textAlign: 'left', padding: '0' }}>
                     <IconButton
                         size="large"
                         edge="start"
                         color="inherit"
                         aria-label="menu"
-                        sx={{ mr: 2 }}
+                        sx={{ ml: 1 }}
                         onClick={
                             currentPage === 'send' ? handleBackClick : undefined
                         }
@@ -81,9 +82,16 @@ function AppTopBar() {
                     </motion.div>
                 </div>
                 <div style={{ flex: 1, textAlign: 'right' }}>
-                    <Button color="inherit" onClick={logout}>
-                        Logout
-                    </Button>
+                    <IconButton
+                        size="large"
+                        edge="start"
+                        color="inherit"
+                        aria-label="menu"
+                        sx={{ mr: 1 }}
+                        onClick={logout}
+                    >
+                        <LogoutIcon />
+                    </IconButton>
                 </div>
             </Toolbar>
         </AppBar>
