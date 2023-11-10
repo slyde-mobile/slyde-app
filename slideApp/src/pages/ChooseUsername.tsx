@@ -31,7 +31,7 @@ const CLAIM_USERNAME = gql`
 function ChooseUsername() {
     const [claiming, setClaiming] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const { web3User, account, web3AuthKey, setUser } = useUser();
+    const { web3User, account, setUser } = useUser();
 
     const inputRef = useRef<HTMLInputElement>();
     const apolloClient: ApolloClient<NormalizedCacheObject> | undefined =
