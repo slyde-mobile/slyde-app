@@ -1,1 +1,0 @@
-# slyde-config
