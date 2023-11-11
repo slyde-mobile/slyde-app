@@ -1,0 +1,4 @@
+name = "slyde-dev"  # The name of your Cloudflare Workers project
+type = "javascript"  # The type of project (can be "webpack", "javascript", or "rust")
+account_id = "656af7cea6402beb0d0ed335b7b937aa"  # Your Cloudflare account ID
+workers_dev = true
