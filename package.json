@@ -49,6 +49,7 @@
     "styled-components": "^6.0.9",
     "vite-plugin-pwa": "^0.16.5",
     "workbox-build": "^7.0.0",
+    "workbox-window": "^7.0.0",
     "yarn": "^1.22.19"
   },
   "devDependencies": {
