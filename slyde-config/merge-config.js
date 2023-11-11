@@ -12,7 +12,12 @@ const tomlPath = resolve(__dirname, './../.env');
 
 const combineConfigs = async () => {
   const publicConfig = await import(publicConfigPath, { assert: { type: 'json' } });
-  const privateConfig = await import (privateConfigPath, { assert: { type: 'json' } });
+  let privateConfig = {};
+  try {
+     privateConfig = await import (privateConfigPath, { assert: { type: 'json' } });
+  } catch (err) {
+    console.log('no private config found', err);
+  }
 
   const combinedConfig = {
     ...publicConfig.default,
