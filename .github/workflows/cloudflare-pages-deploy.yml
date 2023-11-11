@@ -20,9 +20,6 @@ jobs:
             - name: Install Dependencies
               run: yarn install # Adjust this line based on your project's dependency manager
 
-            - name: Build
-              run: yarn build
-
             - name: Create config.dev.secret.json
               env:
                   CONFIG_DEV_SECRET_BASE64: ${{ secrets.CONFIG_DEV_SECRET_BASE64 }}
@@ -30,6 +27,9 @@ jobs:
 
             - name: Merge config
               run: mkdir -p ./config && touch ./config/dev.json &&yarn merge-config
+
+            - name: Build
+              run: yarn build
 
             - name: Deploy to Cloudflare Pages using Wrangler
               uses: cloudflare/wrangler-action@v3
