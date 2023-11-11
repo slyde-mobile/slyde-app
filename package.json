@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "merge-config": "NODE_ENV=dev node ./slyde-config/merge-config.js",
     "prestart": "NODE_ENV=dev node ./slyde-config/merge-config.js && tsc",
     "start": "NODE_ENV=dev vite",
     "poststart": "NODE_ENV=dev node ./slyde-config/cleanup-config.js",

@@ -23,10 +23,15 @@ jobs:
             - name: Build
               run: yarn build
 
+            - run: Create config.dev.secret.json
+              run: echo ${{ secrets.CONFIG_DEV_SECRET }} > slyde-config/config.dev.secret.json
+
+            - name: Merge config
+              run: yarn merge-config
+
             - name: Deploy to Cloudflare Pages using Wrangler
               uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CF_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   command: pages deploy dist --project-name=slyde-dev
-                  with: dist
