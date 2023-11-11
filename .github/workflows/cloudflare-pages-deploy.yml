@@ -26,7 +26,7 @@ jobs:
               run: echo $CONFIG_DEV_SECRET_BASE64 | base64 --decode > ./slyde-config/config.dev.secret.json
 
             - name: Merge config
-              run: mkdir -p ./config && touch ./config/dev.json &&yarn merge-config
+              run: mkdir -p ./config && touch ./config/dev.json && yarn merge-config
 
             - name: Build
               run: yarn build
