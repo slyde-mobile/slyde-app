@@ -20,9 +20,9 @@ const combineConfigs = async () => {
     fs.readFile(privateConfigPath, 'utf8', (err, data) => {
       if (err) {
           console.error('Error reading the file:', err);
-          return;
+      } else {
+        console.log(data); // This will print the content of the file to the console
       }
-      console.log(data); // This will print the content of the file to the console
     });
   }
 
