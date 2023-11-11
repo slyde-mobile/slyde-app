@@ -28,11 +28,8 @@ jobs:
                   CONFIG_DEV_SECRET_BASE64: ${{ secrets.CONFIG_DEV_SECRET_BASE64 }}
               run: echo $CONFIG_DEV_SECRET_BASE64 | base64 --decode > ./slyde-config/config.dev.secret.json
 
-            - name: Touch config
-              run: touch ./config/dev.json
-
             - name: Merge config
-              run: yarn merge-config
+              run: mkdir -p ./config && touch ./config/dev.json &&yarn merge-config
 
             - name: Deploy to Cloudflare Pages using Wrangler
               uses: cloudflare/wrangler-action@v3
