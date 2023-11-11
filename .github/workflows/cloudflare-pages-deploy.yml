@@ -23,7 +23,7 @@ jobs:
             - name: Build
               run: yarn build
 
-            - run: Create config.dev.secret.json
+            - name: Create config.dev.secret.json
               run: echo ${{ secrets.CONFIG_DEV_SECRET }} > slyde-config/config.dev.secret.json
 
             - name: Merge config
