@@ -26,6 +26,9 @@ jobs:
             - name: Create config.dev.secret.json
               run: echo $CONFIG_DEV_SECRET_BASE64 | base64 --decode > slyde-config/config.dev.secret.json
 
+            - name: check config
+              run: echo slyde-config/config.dev.secret.json
+
             - name: Merge config
               run: yarn merge-config
 
