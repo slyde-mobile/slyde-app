@@ -1,3 +1,6 @@
 [submodule "slideApp/slyde-config"]
 	path = slideApp/slyde-config
 	url = git@github.com:slyde-mobile/slyde-config.git
+[submodule "slyde-config"]
+	path = slyde-config
+	url = git@github.com:slyde-mobile/slyde-config.git
