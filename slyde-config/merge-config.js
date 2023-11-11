@@ -7,7 +7,7 @@ const publicConfigPath = './config.' + process.env.NODE_ENV + '.public.json';
 const privateConfigPath = './config.' + process.env.NODE_ENV + '.secret.json';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const combinedPath = resolve(__dirname, './../config/' + process.env.NODE_ENV + '.json');
+const combinedPath = resolve(__dirname, './config/' + process.env.NODE_ENV + '.json');
 const tomlPath = resolve(__dirname, './../.env');
 
 const combineConfigs = async () => {
