@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, splitVendorChunkPlugin } from 'vite';
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill';
 import rollupNodePolyFill from 'rollup-plugin-polyfill-node';
@@ -35,6 +35,7 @@ export default defineConfig({
                 type: 'module',
             },
         }),
+        splitVendorChunkPlugin(),
     ],
     optimizeDeps: {
         esbuildOptions: {
