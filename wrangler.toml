@@ -3,4 +3,4 @@ type = "webpack"  # The type of project (can be "webpack", "javascript", or "rus
 account_id = "656af7cea6402beb0d0ed335b7b937aa"  # Your Cloudflare account ID
 workers_dev = true
 
-main = "dist"
+main = "dist/index.html"
