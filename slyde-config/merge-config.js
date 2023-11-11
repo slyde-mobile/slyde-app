@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs';
+import fs, { writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { resolve, dirname } from 'path';
 import json2toml from 'json2toml';
@@ -12,11 +12,18 @@ const tomlPath = resolve(__dirname, './../.env');
 
 const combineConfigs = async () => {
   const publicConfig = await import(publicConfigPath, { assert: { type: 'json' } });
-  let privateConfig = {};
+  let privateConfig = { default: {}};
   try {
      privateConfig = await import (privateConfigPath, { assert: { type: 'json' } });
   } catch (err) {
     console.log('no private config found', err);
+    fs.readFile(privateConfigPath, 'utf8', (err, data) => {
+      if (err) {
+          console.error('Error reading the file:', err);
+          return;
+      }
+      console.log(data); // This will print the content of the file to the console
+    });
   }
 
   const combinedConfig = {
