@@ -10,10 +10,10 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
 
-            - name: Set up Node.js (if needed)
-              uses: actions/setup-node@v2
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
               with:
                   node-version: '18' # Specify your Node.js version here
 
@@ -24,7 +24,7 @@ jobs:
               run: yarn build
 
             - name: Deploy to Cloudflare Pages using Wrangler
-              uses: cloudflare/wrangler-action@1.3.0
+              uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CF_API_TOKEN }}
                   environment: 'production' # Adjust as needed
