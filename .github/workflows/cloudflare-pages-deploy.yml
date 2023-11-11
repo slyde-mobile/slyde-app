@@ -28,6 +28,6 @@ jobs:
               with:
                   apiToken: ${{ secrets.CF_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  command: pages deploy --project-name=slyde-dev
+                  command: pages deploy dist --project-name=slyde-dev
                   projectName: slyde-dev
                   with: dist
