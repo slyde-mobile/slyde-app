@@ -44,7 +44,7 @@ const clientsReducer = (
         case 'setWeb3Auth':
             return { ...state, web3Auth: action.payload };
         default:
-            throw new Error('Unknown action type');
+            throw new Error('Unknown action type.');
     }
 };
 
