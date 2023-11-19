@@ -41,7 +41,6 @@ export default class SolanaRpc {
     };
 
     getConnection = async (): Promise<Connection> => {
-        console.log('provider', this.provider);
         const solanaWallet = new SolanaWallet(this.provider);
         const connectionConfig = await solanaWallet.request<
             string[],

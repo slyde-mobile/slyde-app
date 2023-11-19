@@ -122,7 +122,6 @@ function App() {
                 if (loading) {
                     setLoading(false);
                 }
-                console.log('User logged in');
             }
         };
         initUser();

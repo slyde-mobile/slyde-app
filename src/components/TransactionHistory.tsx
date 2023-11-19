@@ -75,10 +75,6 @@ function TransactionHistory() {
 
     useEffect(() => {
         if (user) {
-            console.log(
-                'processingTransactionState: ',
-                processingTransactionState,
-            );
             getUserTransactionHistory({
                 variables: { account: user.account },
                 fetchPolicy:

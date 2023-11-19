@@ -7,12 +7,12 @@ import { UserProvider } from './providers/UserProvider';
 
 function Root() {
     const onConnected = () => {
-        console.log('Connected!');
+        // console.log('Connected!');
         // setLoggedIn(true);
     };
 
     const onConnecting = () => {
-        console.log('Connecting...');
+        // console.log('Connecting...');
         // setLoggedIn(false);
         // setLoading(true);
     };

@@ -55,7 +55,6 @@ function ChooseUsername() {
                         sns: inputValue.trim(),
                     },
                 });
-                console.log(ret); // log the response to console
                 if (ret.data != null) {
                     // this errors b/c the the object is not typed. i'd love to just call ret.data.user on this but it errors
                     setUser(ret.data.claimUsername);

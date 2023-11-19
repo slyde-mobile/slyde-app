@@ -86,11 +86,6 @@ function SendPrompt() {
         const rpc = new RPC(web3Auth.provider);
         const subdomain = snsRef.current?.value + '.slydedev.sol';
         const subdomainAccount = await rpc.getAddressForSubdomain(subdomain);
-        console.log(
-            'subdomainAccount',
-            subdomain,
-            subdomainAccount?.toBase58(),
-        );
 
         if (subdomainAccount == null) {
             setSnsError('Username not found');
@@ -118,7 +113,6 @@ function SendPrompt() {
                     blockHash: signedTxn.recentBlockhash,
                 },
             });
-            console.log(response.data.signTransaction);
             setProcessingTransactionState('completed');
         };
 
