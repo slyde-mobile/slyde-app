@@ -57,7 +57,7 @@ export const ClientsProvider: React.FC<
         useUser();
 
     const httpLink = new HttpLink({
-        uri: 'http://127.0.0.1:8080/graphql',
+        uri: import.meta.env.VITE_GRAPHQL_SERVER_URL,
     });
 
     useEffect(() => {
