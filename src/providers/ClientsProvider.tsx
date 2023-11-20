@@ -69,7 +69,8 @@ export const ClientsProvider: React.FC<
                     cache: new InMemoryCache(),
                 });
 
-                const web3Auth = createWeb3Auth();
+                const web3Auth = await createWeb3Auth();
+                    
                 web3Auth.on(ADAPTER_EVENTS.CONNECTED, async () => {
                     onConnected();
                     setLoggedIn(true);
@@ -87,6 +88,7 @@ export const ClientsProvider: React.FC<
 
                 dispatch({ type: 'setApolloClient', payload: apolloClient });
                 dispatch({ type: 'setWeb3Auth', payload: web3Auth });
+                
             }
         };
         initializeProviders();

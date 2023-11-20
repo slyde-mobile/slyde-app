@@ -5,10 +5,13 @@ import Balance from '../components/Balance';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
+import ReceiveIcon from '@mui/icons-material/AttachMoneyRounded';
+import AddIcon from '@mui/icons-material/AddCircleOutline'; 
+
 
 function Dashboard() {
     const { setCurrentPage, user } = useUser();
-
+    // const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
     const [isScrolled, setIsScrolled] = useState(false);
 
     const handleScroll = () => {
@@ -28,15 +31,10 @@ function Dashboard() {
 
     return (
         <>
-            <Typography variant="h4" sx={{ padding: 2, paddingLeft: 4 }}>
-                Quickly send USDC
-            </Typography>
-
             <Box
                 sx={{
-                    background: 'rgba(153, 51, 255, 0.2)', // Light purple background with transparency
-                    padding: 2,
                     margin: 2,
+                    marginTop: 10,
                     borderRadius: 0,
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -45,28 +43,59 @@ function Dashboard() {
             >
                 <div>
                     <Typography variant="subtitle1" align="left">
-                        USDC Balance
+                        Current Balance
                     </Typography>
                     <Balance />
-                    <Typography variant="subtitle1" align="left">
-                        @{user?.sns}
-                    </Typography>
                 </div>
-                <div>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-start', p: 0, margin: 2, flexWrap: 'wrap' }}>
                     <Button
-                        sx={{ height: '3rem', alignSelf: 'center' }}
+                        sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
                         variant="contained"
                         onClick={onSend}
                         color="primary"
                         endIcon={<SendIcon />}
                     >
                         Send
-                    </Button>
-                </div>
+                    </Button> 
+                    <Box sx={{ width: 12 }} />
+                    <Button
+                        sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
+                        variant="contained"
+                        onClick={onSend}
+                        color="primary"
+                        endIcon={<ReceiveIcon />}
+                    >
+                        Receive
+                    </Button>    
+                    <Box sx={{ width: 12 }} />                 
+                    <Button
+                        sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
+                        variant="contained"
+                        onClick={onSend}
+                        color="primary"
+                        endIcon={<AddIcon />}
+                    >
+                        Add Funds
+                    </Button>    
+                    <Box sx={{ height: '2rem', flexGrow: 10, flexBasis: 'auto' }} />                                         
             </Box>
 
-            <Divider />
+            <Divider sx={{ borderColor: '#813ef9', my: 2, margin: '7px 14px 0 14px' }} />
 
+            <Box
+                sx={{
+                    margin: 2,
+                    borderRadius: 0,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                }}
+            >
+                <Typography variant="subtitle1" align="left" sx={{ fontWeight: 'bold' }}>
+                    @{user?.sns}.slyde.sol
+                </Typography>
+            </Box>            
             <TransactionHistory />
             <motion.div
                 initial={{ y: 100 }}

@@ -49,7 +49,7 @@ function Balance() {
     if (!data) return <p>...</p>;
 
     return (
-        <Typography variant="h3" align="left">
+        <Typography variant="h4" align="left" sx={{ marginTop: 1.5 }}>
             ${data.userWalletBalance.uiAmountString}
         </Typography>
     );

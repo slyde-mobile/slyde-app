@@ -17,8 +17,8 @@ interface CreateUserResponse {
 }
 
 const CREATE_USER = gql`
-    mutation CreateUser($account: String, $emailAddress: String!) {
-        createUser(account: $account, emailAddress: $emailAddress) {
+    mutation CreateUser($account: String!, $emailAddress: String, $name: String, $verifierId: String, $verifier: String) {
+        createUser(account: $account, emailAddress: $emailAddress, name: $name, verifierId: $verifierId, verifier: $verifier) {
             account
             sns
         }
@@ -56,9 +56,11 @@ function App() {
             mutation: CREATE_USER,
             variables: {
                 account,
-                emailAddress: web3User.email,
+                emailAddress: web3User?.email,
                 name: web3User.name,
                 profileImage: web3User.profileImage,
+                verifierId: web3User.verifierId,
+                verifier: web3User.verifier,
             },
         });
         setUser(ret.data ? ret.data.createUser : null);

@@ -26,7 +26,7 @@ export function getChainConfig(): CustomChainConfig {
     };
 }
 
-export function createWeb3Auth(): Web3AuthNoModal {
+export async function createWeb3Auth(): Promise<Web3AuthNoModal> {
     const chainConfig = getChainConfig();
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const web3auth = new Web3AuthNoModal({

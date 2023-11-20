@@ -103,7 +103,7 @@ function SendPrompt() {
         const handleSignTransaction = async () => {
             setProcessingTransactionState('processing');
             setCurrentPage('dashboard');
-            const response = await signTransaction({
+            await signTransaction({
                 variables: {
                     serializedTransaction: Array.from(
                         signedTxn.serialize({
