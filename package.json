@@ -36,7 +36,6 @@
     "@web3auth/no-modal": "^7.0.4",
     "@web3auth/openlogin-adapter": "^7.0.4",
     "@web3auth/solana-provider": "^7.0.4",
-    "@web3auth/solana-wallet-connector-plugin": "^7.1.1",
     "add": "^2.0.6",
     "axios": "^1.5.1",
     "bn.js": "^5.2.1",
