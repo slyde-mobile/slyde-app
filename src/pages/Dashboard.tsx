@@ -95,7 +95,21 @@ function Dashboard() {
                 <Typography variant="subtitle1" align="left" sx={{ fontWeight: 'bold' }}>
                     @{user?.sns}.slyde.sol
                 </Typography>
-            </Box>            
+            </Box>         
+            <Divider sx={{ borderColor: '#813ef9', my: 2, margin: '0px 14px 0 14px' }} />
+            <Box
+                sx={{
+                    margin: 2,
+                    borderRadius: 0,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                }}
+            >
+                <Typography variant="subtitle1" align="left">
+                    Transaction History
+                </Typography>
+            </Box>                      
             <TransactionHistory />
             <motion.div
                 initial={{ y: 100 }}
