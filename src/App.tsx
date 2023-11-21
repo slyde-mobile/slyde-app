@@ -17,8 +17,20 @@ interface CreateUserResponse {
 }
 
 const CREATE_USER = gql`
-    mutation CreateUser($account: String!, $emailAddress: String, $name: String, $verifierId: String, $verifier: String) {
-        createUser(account: $account, emailAddress: $emailAddress, name: $name, verifierId: $verifierId, verifier: $verifier) {
+    mutation CreateUser(
+        $account: String!
+        $emailAddress: String
+        $name: String
+        $verifierId: String
+        $verifier: String
+    ) {
+        createUser(
+            account: $account
+            emailAddress: $emailAddress
+            name: $name
+            verifierId: $verifierId
+            verifier: $verifier
+        ) {
             account
             sns
         }

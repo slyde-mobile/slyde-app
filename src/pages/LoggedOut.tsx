@@ -10,8 +10,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 const textFieldVariant = {
     initial: { x: -100, width: 0, opacity: 0 },
-    animate: { x: 0, width: '240px', opacity: 1, transition: { duration: 0.5 } }
-  };
+    animate: {
+        x: 0,
+        width: '240px',
+        opacity: 1,
+        transition: { duration: 0.5 },
+    },
+};
 
 const LoggedOut = () => {
     const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
@@ -24,22 +29,24 @@ const LoggedOut = () => {
         // Regular expression to check if phone number is in the format +{country-code}-{phone number}
         const regex = /^\+\d{1,3}-\d{1,15}$/;
         return regex.test(number);
-      };
-    
-      const handleChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+    };
+
+    const handleChange = (event: {
+        target: { value: SetStateAction<string> };
+    }) => {
         setPhoneNumber(event.target.value);
         setIsValid(true);
-      };
+    };
 
-      const loginOrToggleSMS = async () => {
+    const loginOrToggleSMS = async () => {
         if (smsLogin) {
             await loginWithSMS();
         } else {
             chooseSMSlogin();
         }
-      }
-    
-      const loginWithSMS = async () => {
+    };
+
+    const loginWithSMS = async () => {
         if (validatePhoneNumber(phoneNumber)) {
             if (!web3Auth) {
                 return;
@@ -48,12 +55,12 @@ const LoggedOut = () => {
                 loginProvider: 'sms_passwordless',
                 extraLoginOptions: {
                     login_hint: phoneNumber,
-                  },
+                },
             });
         } else {
-          setIsValid(false);
+            setIsValid(false);
         }
-      };
+    };
 
     const loginWithGoogle = async () => {
         if (!web3Auth) {
@@ -80,9 +87,9 @@ const LoggedOut = () => {
         >
             <AppLogo />
             <h1>Slyde</h1>
-            <div className="card">                
-                <AnimatePresence>                        
-                    <Box display="flex" alignItems="flex-start">                            
+            <div className="card">
+                <AnimatePresence>
+                    <Box display="flex" alignItems="flex-start">
                         {smsLogin ? (
                             <motion.div
                                 initial="initial"
@@ -99,20 +106,26 @@ const LoggedOut = () => {
                                     color="secondary"
                                     value={phoneNumber}
                                     error={!isValid}
-                                    helperText={!isValid && "Please enter a valid phone number: +{country-code}-{number}"}
-                                    inputProps={{ style: { color: 'white' } }}                        
-                                /> 
+                                    helperText={
+                                        !isValid &&
+                                        'Please enter a valid phone number: +{country-code}-{number}'
+                                    }
+                                    inputProps={{ style: { color: 'white' } }}
+                                />
                             </motion.div>
                         ) : (
-                            <GoogleLoginButton onClick={() => loginWithGoogle()} />
+                            <GoogleLoginButton
+                                onClick={() => loginWithGoogle()}
+                            />
                         )}
-                        <SMSLoginButton showText={!smsLogin} onClick={() => loginOrToggleSMS()} />
+                        <SMSLoginButton
+                            showText={!smsLogin}
+                            onClick={() => loginOrToggleSMS()}
+                        />
                     </Box>
-                </AnimatePresence>  
+                </AnimatePresence>
             </div>
-            <div className="card">
-                
-            </div>
+            <div className="card"></div>
         </div>
     );
 };

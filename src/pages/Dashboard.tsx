@@ -6,8 +6,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import ReceiveIcon from '@mui/icons-material/AttachMoneyRounded';
-import AddIcon from '@mui/icons-material/AddCircleOutline'; 
-
+import AddIcon from '@mui/icons-material/AddCircleOutline';
 
 function Dashboard() {
     const { setCurrentPage, user } = useUser();
@@ -43,46 +42,59 @@ function Dashboard() {
             >
                 <div>
                     <Typography variant="subtitle1" align="left">
-                        Current Balance
+                        Current Balance                                           
                     </Typography>
                     <Balance />
                 </div>
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-start', p: 0, margin: 2, flexWrap: 'wrap' }}>
-                    <Button
-                        sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
-                        variant="contained"
-                        onClick={onSend}
-                        color="primary"
-                        endIcon={<SendIcon />}
-                    >
-                        Send
-                    </Button> 
-                    <Box sx={{ width: 12 }} />
-                    <Button
-                        sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
-                        variant="contained"
-                        onClick={onSend}
-                        color="primary"
-                        endIcon={<ReceiveIcon />}
-                    >
-                        Receive
-                    </Button>    
-                    <Box sx={{ width: 12 }} />                 
-                    <Button
-                        sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
-                        variant="contained"
-                        onClick={onSend}
-                        color="primary"
-                        endIcon={<AddIcon />}
-                    >
-                        Add Funds
-                    </Button>    
-                    <Box sx={{ height: '2rem', flexGrow: 10, flexBasis: 'auto' }} />                                         
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-start',
+                    p: 0,
+                    margin: 2,
+                    flexWrap: 'wrap',
+                }}
+            >
+                <Button
+                    sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
+                    variant="contained"
+                    onClick={onSend}
+                    color="primary"
+                    endIcon={<SendIcon />}
+                >
+                    Send
+                </Button>
+                <Box sx={{ width: 12 }} />
+                <Button
+                    sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
+                    variant="contained"
+                    onClick={onSend}
+                    color="primary"
+                    endIcon={<ReceiveIcon />}
+                >
+                    Receive
+                </Button>
+                <Box sx={{ width: 12 }} />
+                <Button
+                    sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
+                    variant="contained"
+                    onClick={onSend}
+                    color="primary"
+                    endIcon={<AddIcon />}
+                >
+                    Add Funds
+                </Button>
+                <Box sx={{ height: '2rem', flexGrow: 10, flexBasis: 'auto' }} />
             </Box>
 
-            <Divider sx={{ borderColor: '#813ef9', my: 2, margin: '7px 14px 0 14px' }} />
-
+            <Divider
+                sx={{
+                    borderColor: '#813ef9',
+                    my: 2,
+                    margin: '0px 14px 0 14px',
+                }}
+            />
             <Box
                 sx={{
                     margin: 2,
@@ -92,24 +104,7 @@ function Dashboard() {
                     alignItems: 'center',
                 }}
             >
-                <Typography variant="subtitle1" align="left" sx={{ fontWeight: 'bold' }}>
-                    @{user?.sns}.slyde.sol
-                </Typography>
-            </Box>         
-            <Divider sx={{ borderColor: '#813ef9', my: 2, margin: '0px 14px 0 14px' }} />
-            <Box
-                sx={{
-                    margin: 2,
-                    borderRadius: 0,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                }}
-            >
-                <Typography variant="subtitle1" align="left">
-                    Transaction History
-                </Typography>
-            </Box>                      
+            </Box>
             <TransactionHistory />
             <motion.div
                 initial={{ y: 100 }}

@@ -4,6 +4,7 @@ import {
     PublicKey,
     SystemProgram,
     Transaction,
+    TransactionInstruction,
 } from '@solana/web3.js';
 import {
     createTransferInstruction,
@@ -11,6 +12,7 @@ import {
     getAccount,
     createAssociatedTokenAccountInstruction,
 } from '@solana/spl-token';
+import { Buffer } from 'buffer/';
 import { resolve } from '@bonfida/spl-name-service';
 import { CustomChainConfig, IProvider } from '@web3auth/base';
 import { SolanaWallet } from '@web3auth/solana-provider';
@@ -154,6 +156,18 @@ export default class SolanaRpc {
                 20000,
             ),
         );
+
+        transaction.add(
+            new TransactionInstruction({
+                keys: [{ pubkey: from, isSigner: true, isWritable: true }],
+                // @ts-ignore
+                data: Buffer.from('Sup g.', 'utf-8'),
+                programId: new PublicKey(
+                    'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr',
+                ),
+            }),
+        );
+
         return transaction;
     };
 

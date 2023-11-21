@@ -34,16 +34,16 @@ const containerVariants = {
         y: 0, // End at the natural position
         transition: {
             duration: 0.3, // Define how long the animation should take
-            ease: 'linear' // Define the type of easing. Here it is linear.
+            ease: 'linear', // Define the type of easing. Here it is linear.
         },
     },
     exit: {
         y: '100vh', // Exit off the bottom of the screen
         transition: {
             duration: 0.3, // Define how long the animation should take
-            ease: 'linear' // Define the type of easing. Here it is linear.
+            ease: 'linear', // Define the type of easing. Here it is linear.
         },
-    }
+    },
 };
 
 function SendPrompt() {
@@ -156,7 +156,7 @@ function SendPrompt() {
                 zIndex: 100, // Make sure it's on top of other elements
                 // Add additional styling as needed
             }}
-        >      
+        >
             <div style={{ marginTop: '64px' }}>
                 <div style={{ padding: '20px' }}>
                     <div
@@ -193,7 +193,11 @@ function SendPrompt() {
                                             variant="h6"
                                             color="textSecondary"
                                         >
-                                            .slyde
+                                            .
+                                            {
+                                                import.meta.env
+                                                    .VITE_SNS_PARENT_DOMAIN
+                                            }
                                         </Typography>
                                     </InputAdornment>
                                 ),
@@ -262,7 +266,7 @@ function SendPrompt() {
                     )}
                 </div>
             </div>
-        </motion.div>  
+        </motion.div>
     );
 }
 

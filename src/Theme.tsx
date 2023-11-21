@@ -18,7 +18,11 @@ const Theme = createTheme({
         error: {
             main: '#ff0000',
         },
+        success: {
+            main: '#009933', //green
+        },
         text: {
+            primary: '#fff',
             secondary: '#f2b842',
         },
     },

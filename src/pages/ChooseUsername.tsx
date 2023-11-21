@@ -5,6 +5,7 @@ import {
     TextField,
     Typography,
     CircularProgress,
+    Box,
 } from '@mui/material';
 import {
     ApolloClient,
@@ -38,13 +39,16 @@ function ChooseUsername() {
         useContext(ApolloContext);
 
     async function claimSNSDomainRequest() {
+        if (claiming) {
+            return;
+        }
         if (
             apolloClient &&
             inputRef.current &&
             inputRef.current !== null &&
             web3User != null
         ) {
-            const inputValue = inputRef.current.value;
+            const inputValue = inputRef.current.value.toLowerCase();
             try {
                 setError(null);
                 setClaiming(true);
@@ -71,62 +75,80 @@ function ChooseUsername() {
     }
 
     return (
-        <div style={{ marginTop: '64px' }}>
-            <div style={{ padding: '20px' }}>
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginBottom: '20px',
-                    }}
-                >
-                    <TextField
-                        fullWidth
-                        variant="outlined"
-                        label={error ? 'Error' : ''}
-                        placeholder="Enter your username"
-                        color="secondary"
-                        inputRef={inputRef}
-                        error={!!error}
-                        helperText={error}
-                        inputProps={{ style: { color: 'white' } }}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <Typography
-                                        variant="h6"
-                                        color="textSecondary"
-                                    >
-                                        .slyde
-                                    </Typography>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                </div>
-
-                <Button
-                    disabled={claiming}
-                    variant="contained"
-                    color="secondary"
-                    onClick={claimSNSDomainRequest}
+        <div style={{ marginTop: '64px', padding: '20px' }}>
+            <Typography
+                color="textPrimary"
+                align="left"
+                sx={{ marginBottom: 2 }}
+            >
+                Choose your slyde name. <br />
+                You can give this name to your friends and use it to send and
+                receive USDC.
+            </Typography>
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: '20px',
+                }}
+            >
+                <TextField
                     fullWidth
-                    style={{ marginBottom: '10px' }}
+                    variant="outlined"
+                    label={error ? 'Error' : ''}
+                    placeholder="Enter your username"
+                    color="secondary"
+                    inputRef={inputRef}
+                    error={!!error}
+                    helperText={error}
+                    inputProps={{ style: { color: 'white' } }}
+                    sx={!error ? { marginBottom: 2.75 } : {}}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <Typography variant="h6" color="textSecondary">
+                                    .{import.meta.env.VITE_SNS_PARENT_DOMAIN}
+                                </Typography>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </div>
+
+            <Button
+                variant="contained"
+                color="secondary"
+                onClick={claimSNSDomainRequest}
+                fullWidth
+                style={{ marginBottom: '10px' }}
+            >
+                <Box
+                    position="relative"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
                 >
                     {claiming ? (
-                        <CircularProgress size={24} />
-                    ) : (
-                        'Choose Username'
-                    )}
-                </Button>
-                {account && (
-                    <div>
-                        <Typography variant="caption" color="textSecondary">
-                            {account}
-                        </Typography>
-                    </div>
-                )}
-            </div>
+                        <CircularProgress size={24} sx={{ marginRight: 2 }} />
+                    ) : null}
+                    <>
+                        {claiming && inputRef && inputRef.current
+                            ? 'Claiming ' +
+                              inputRef.current.value.toLowerCase() +
+                              '.' +
+                              import.meta.env.VITE_SNS_PARENT_DOMAIN +
+                              ' name'
+                            : 'Choose Username'}
+                    </>
+                </Box>
+            </Button>
+            {account && (
+                <div style={{ display: 'none' }}>
+                    <Typography variant="caption" color="textSecondary">
+                        {account}
+                    </Typography>
+                </div>
+            )}
         </div>
     );
 }
