@@ -28,7 +28,6 @@ const CLAIM_USERNAME = gql`
         claimUsername(account: $account, sns: $sns) {
             account
             sns
-            account
             verifier
             verifierId
         }
