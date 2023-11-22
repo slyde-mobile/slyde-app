@@ -1,13 +1,7 @@
 import React, { createContext } from 'react';
 import { OpenloginUserInfo } from '@web3auth/openlogin-adapter';
 import { WalletBallance } from '../components/Balance';
-
-export interface User {
-    account: string;
-    sns: string | null;
-    email_address: string | null;
-    last_login: Date;
-}
+import { User } from './User';
 
 export interface UpdateAppReady {
     clientsInitialized: boolean;

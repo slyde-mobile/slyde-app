@@ -16,6 +16,7 @@ import { Buffer } from 'buffer/';
 import { resolve } from '@bonfida/spl-name-service';
 import { CustomChainConfig, IProvider } from '@web3auth/base';
 import { SolanaWallet } from '@web3auth/solana-provider';
+import ISnsAccount from '../types/snsAccount';
 
 const USDC_MINT = new PublicKey(import.meta.env.VITE_USDC_MINT_ADDRESS); // USDC mainnet Circle mint
 const TOKEN_PROGRAM_ID = new PublicKey(
@@ -86,14 +87,37 @@ export default class SolanaRpc {
         return solanaWallet.signTransaction(transaction);
     };
 
+    getSnsAccountForSubdomain = async (
+        subdomain: string,
+    ): Promise<ISnsAccount | null> => {
+        if (subdomain.indexOf('.') === -1) {
+            subdomain = subdomain + '.' + import.meta.env.VITE_SNS_PARENT_DOMAIN;
+        }
+        const subdomainAccount = await this.getAddressForSubdomain(subdomain);
+        if (!subdomainAccount) {
+            return null;
+        }
+        const usdcTokenAccount = await getAssociatedTokenAddress(
+            USDC_MINT,
+            subdomainAccount,
+        );
+
+        return {
+            snsName: subdomain,
+            account: subdomainAccount,
+            usdcAccount: usdcTokenAccount,
+        };
+    };
+
     // the from and to public keys should just be the accounts that are sending and receiving the USDC
     // not the token accounts for usdc
     // we will look those up or create them here
     generateUSDCSendTransaction = async (
-        from: PublicKey,
-        to: PublicKey,
+        from: ISnsAccount,
+        to: ISnsAccount,
         amount: number,
-    ): Promise<Transaction> => {
+        memo: string,
+    ): Promise<[Transaction, ISnsAccount, ISnsAccount]> => {
         const payer = new PublicKey(
             'Hep4fgJ8mvFTRNh3GRjD4fTgA3GnAP4XPtB2ULAzFHUu',
         );
@@ -107,11 +131,12 @@ export default class SolanaRpc {
             lastValidBlockHeight,
         });
 
-        const fromTokenAddress = await getAssociatedTokenAddress(
-            USDC_MINT,
-            from,
-        );
-        const toTokenAddress = await getAssociatedTokenAddress(USDC_MINT, to);
+        // const fromTokenAddress = await getAssociatedTokenAddress(
+        //     USDC_MINT,
+        //     from,
+        // );
+
+        // const toTokenAddress = await getAssociatedTokenAddress(USDC_MINT, to);
         const feePayerTokenAddress = await getAssociatedTokenAddress(
             USDC_MINT,
             payer,
@@ -122,7 +147,7 @@ export default class SolanaRpc {
         try {
             await getAccount(
                 conn,
-                toTokenAddress,
+                to.usdcAccount,
                 'confirmed',
                 TOKEN_PROGRAM_ID,
             );
@@ -131,8 +156,8 @@ export default class SolanaRpc {
             transaction.add(
                 createAssociatedTokenAccountInstruction(
                     payer,
-                    toTokenAddress,
-                    to,
+                    to.usdcAccount,
+                    to.account,
                     USDC_MINT,
                     TOKEN_PROGRAM_ID,
                     ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -142,33 +167,35 @@ export default class SolanaRpc {
 
         transaction.add(
             createTransferInstruction(
-                fromTokenAddress,
-                toTokenAddress,
-                from,
+                from.usdcAccount,
+                to.usdcAccount,
+                from.account,
                 amount,
             ),
         );
         transaction.add(
             createTransferInstruction(
-                fromTokenAddress,
+                from.usdcAccount,
                 feePayerTokenAddress,
-                from,
+                from.account,
                 20000,
             ),
         );
 
         transaction.add(
             new TransactionInstruction({
-                keys: [{ pubkey: from, isSigner: true, isWritable: true }],
+                keys: [
+                    { pubkey: from.account, isSigner: true, isWritable: true },
+                ],
                 // @ts-ignore
-                data: Buffer.from('Sup g.', 'utf-8'),
+                data: Buffer.from(memo, 'utf-8'),
                 programId: new PublicKey(
                     'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr',
                 ),
             }),
         );
 
-        return transaction;
+        return [transaction, from, to];
     };
 
     sendTransaction = async (): Promise<string> => {

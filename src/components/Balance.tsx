@@ -34,7 +34,7 @@ function Balance() {
     const { loading, error, data } = useQuery<WalletBalanceResponse, any>(
         GET_USER_WALLET_BALANCE,
         {
-            variables: { account: user.account },
+            variables: { account: user.snsAccount?.account },
         },
     );
 

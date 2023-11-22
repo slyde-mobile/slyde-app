@@ -23,7 +23,7 @@ const Theme = createTheme({
         },
         text: {
             primary: '#fff',
-            secondary: '#f2b842',
+            secondary: '#f2b842',            
         },
     },
     components: {
@@ -72,7 +72,13 @@ const Theme = createTheme({
                     '&:hover': {
                         backgroundColor: '#d9a534', // A slightly darker shade when hovered
                     },
+                    '&:disabled': {
+                        backgroundColor: '#cc9933',
+                        color: '#666',
+                        borderColor: '#cc9900',
+                    },
                 },
+
             },
         },
         MuiAppBar: {

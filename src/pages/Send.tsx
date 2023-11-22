@@ -11,15 +11,31 @@ import RPC from '../util/solanaRPC';
 import { Web3AuthNoModal } from '@web3auth/no-modal';
 import { useContext } from 'react';
 import { Web3AuthContext } from '../providers/ClientsProvider';
-import { PublicKey } from '@solana/web3.js';
 import { gql, useMutation } from '@apollo/client';
 import { motion } from 'framer-motion';
+import SearchBySNS from './SearchBySns';
+import { IUser } from '../providers/IUser';
+
+
+export type SelectUserEvent = {
+    user: IUser | null;
+    sns: string;
+    event: string;
+};
+
 
 const SIGN_TRANSACTION = gql`
-    mutation SendMoney($serializedTransaction: [Int!]!, $blockHash: String!) {
+    mutation SendMoney($serializedTransaction: [Int!]!, $blockHash: String!, $fromSnsName: String, $fromAccount: String, $fromTokenAccount: String, $toSnsName: String, $toAccount: String, $toTokenAccount: String, $token: String) {
         sendMoney(
             serializedTransaction: $serializedTransaction
             blockHash: $blockHash
+            fromSnsName: $fromSnsName
+            fromAccount: $fromAccount
+            fromTokenAccount: $fromTokenAccount
+            toSnsName: $toSnsName
+            toAccount: $toAccount
+            toTokenAccount: $toTokenAccount
+            token: $token            
         ) {
             signature
         }
@@ -49,7 +65,9 @@ const containerVariants = {
 function SendPrompt() {
     const [sending, setSending] = useState<boolean>(false);
     const [amountError, setAmountError] = useState<string | null>(null);
+    const [memoError, setMemoError] = useState<string | null>(null);
     const [snsError, setSnsError] = useState<string | null>(null);
+    const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
     const {
         account,
         user,
@@ -60,16 +78,33 @@ function SendPrompt() {
 
     const snsRef = useRef<HTMLInputElement>();
     const amountRef = useRef<HTMLInputElement>();
+    const memoRef = useRef<HTMLInputElement>();
 
     const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
 
     const [signTransaction] = useMutation(SIGN_TRANSACTION);
+
+    // Event handler to show the search component
+    const handleFocus = () => {
+        setIsSearchVisible(true);
+    };
+
+    const handleSelectUser = (event: SelectUserEvent) => {
+        setIsSearchVisible(false);
+        if (event.user) {
+            snsRef.current!.value = event.user.sns ? event.user.sns : '';
+        } else {
+            snsRef.current!.value = event.sns;
+        }
+    };
+
 
     const onSend = async () => {
         if (
             web3Auth == null ||
             web3Auth.provider == null ||
             user == null ||
+        user.snsAccount == null ||
             userBalance == null
         ) {
             return;
@@ -97,26 +132,36 @@ function SendPrompt() {
             setAmountError('Insufficient balance');
             return;
         }
+        setAmountError(null);
 
         if (snsRef.current?.value == null || snsRef.current?.value === '') {
             setSnsError('Please enter a username');
             return;
         }
+        setSnsError(null);
+
+        if (memoRef.current?.value == null || memoRef.current?.value === '') {
+            setMemoError('Please enter a message');
+            return;
+        }
+        setMemoError(null);
 
         // setSending(true);
         const rpc = new RPC(web3Auth.provider);
         const subdomain = snsRef.current?.value + '.slydedev.sol';
-        const subdomainAccount = await rpc.getAddressForSubdomain(subdomain);
+        const subdomainAccount = await rpc.getSnsAccountForSubdomain(subdomain);
 
         if (subdomainAccount == null) {
             setSnsError('Username not found');
             return;
         }
+        setSnsError(null);
 
-        const txn = await rpc.generateUSDCSendTransaction(
-            new PublicKey(user.account),
+        const [txn, from, to] = await rpc.generateUSDCSendTransaction(
+            user.snsAccount,
             subdomainAccount,
             amountInCents,
+            memoRef.current?.value,
         );
 
         const signedTxn = await rpc.signTransaction(txn);
@@ -132,6 +177,13 @@ function SendPrompt() {
                         }),
                     ),
                     blockHash: signedTxn.recentBlockhash,
+                    fromSnsName: from.account,
+                    fromAccount: from.account,
+                    fromTokenAccount: from.usdcAccount,
+                    toSnsName: to.snsName,
+                    toAccount: to.account,
+                    toTokenAccount: to.usdcAccount,
+                    token: 'USDC',
                 },
             });
             setProcessingTransactionState('completed');
@@ -139,6 +191,8 @@ function SendPrompt() {
 
         await handleSignTransaction();
     };
+
+    const snsWithoutDomain = user?.snsAccount?.snsName?.replace('.' + import.meta.env.VITE_SNS_PARENT_DOMAIN, '');
 
     return (
         <motion.div
@@ -157,8 +211,52 @@ function SendPrompt() {
                 // Add additional styling as needed
             }}
         >
+            {isSearchVisible && <SearchBySNS onSelect={handleSelectUser} value={snsRef.current!.value} />}
             <div style={{ marginTop: '64px' }}>
                 <div style={{ padding: '20px' }}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginBottom: '20px',
+                        }}
+                    >
+                        <TextField
+                            fullWidth
+                            variant="outlined"
+                            label="From"
+                            value={snsWithoutDomain}
+                            color="secondary"
+                            inputProps={{ style: { color: 'white' } }}
+                            contentEditable={false}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <Typography
+                                            variant="h6"
+                                            color="textSecondary"
+                                        >
+                                            &nbsp;
+                                        </Typography>
+                                    </InputAdornment>
+                                ),
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <Typography
+                                            variant="h6"
+                                            color="textSecondary"
+                                        >
+                                            .
+                                            {
+                                                import.meta.env
+                                                    .VITE_SNS_PARENT_DOMAIN
+                                            }
+                                        </Typography>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                    </div>
                     <div
                         style={{
                             display: 'flex',
@@ -172,6 +270,7 @@ function SendPrompt() {
                             label={snsError ? 'Error' : 'Send Money To'}
                             placeholder="Enter username to send to"
                             color="secondary"
+                            onFocus={handleFocus}
                             inputRef={snsRef}
                             error={!!snsError}
                             helperText={snsError}
@@ -246,6 +345,28 @@ function SendPrompt() {
                             }}
                         />
                     </div>
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginBottom: '20px',
+                        }}
+                    >
+                        <TextField
+                            fullWidth
+                            variant="outlined"
+                            label={memoError ? 'Error' : 'Message'}
+                            placeholder="Add a message (required)"
+                            color="secondary"
+                            inputRef={memoRef}
+                            error={!!memoError}
+                            helperText={memoError}
+                            multiline
+                            rows={4} // Adjust the number of rows as needed
+                            style={{ marginBottom: '20px', color: 'white' }} // Adjust styling as needed
+                            // Add any necessary props like inputRef, error, or helperText
+                        />
+                    </div>
 
                     <Button
                         disabled={sending}
@@ -258,7 +379,7 @@ function SendPrompt() {
                         {sending ? <CircularProgress size={24} /> : 'Send USDC'}
                     </Button>
                     {account && (
-                        <div>
+                        <div style={{ display: 'none' }}>
                             <Typography variant="caption" color="textSecondary">
                                 {account}
                             </Typography>

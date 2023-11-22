@@ -9,7 +9,7 @@ import ReceiveIcon from '@mui/icons-material/AttachMoneyRounded';
 import AddIcon from '@mui/icons-material/AddCircleOutline';
 
 function Dashboard() {
-    const { setCurrentPage, user } = useUser();
+    const { setCurrentPage } = useUser();
     // const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
     const [isScrolled, setIsScrolled] = useState(false);
 
@@ -28,6 +28,10 @@ function Dashboard() {
         setCurrentPage('send');
     };
 
+    const onAddFunds = () => {
+        setCurrentPage('receive');
+    };
+
     return (
         <>
             <Box
@@ -42,7 +46,7 @@ function Dashboard() {
             >
                 <div>
                     <Typography variant="subtitle1" align="left">
-                        Current Balance                                           
+                        Current Balance
                     </Typography>
                     <Balance />
                 </div>
@@ -63,28 +67,28 @@ function Dashboard() {
                     color="primary"
                     endIcon={<SendIcon />}
                 >
-                    Send
+                    Pay
                 </Button>
                 <Box sx={{ width: 12 }} />
                 <Button
                     sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
                     variant="contained"
-                    onClick={onSend}
-                    color="primary"
-                    endIcon={<ReceiveIcon />}
-                >
-                    Receive
-                </Button>
-                <Box sx={{ width: 12 }} />
-                <Button
-                    sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
-                    variant="contained"
-                    onClick={onSend}
+                    onClick={onAddFunds}
                     color="primary"
                     endIcon={<AddIcon />}
                 >
                     Add Funds
                 </Button>
+                <Box sx={{ width: 12 }} />
+                <Button
+                    sx={{ height: '2.75rem', flexGrow: 1, flexBasis: 'auto' }}
+                    variant="contained"
+                    color="primary"
+                    endIcon={<ReceiveIcon />}
+                    disabled
+                >
+                    Request
+                </Button>                
                 <Box sx={{ height: '2rem', flexGrow: 10, flexBasis: 'auto' }} />
             </Box>
 
@@ -103,8 +107,7 @@ function Dashboard() {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                 }}
-            >
-            </Box>
+            ></Box>
             <TransactionHistory />
             <motion.div
                 initial={{ y: 100 }}

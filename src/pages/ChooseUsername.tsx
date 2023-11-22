@@ -13,11 +13,14 @@ import {
     NormalizedCacheObject,
     gql,
 } from '@apollo/client';
-import { ApolloContext } from '../providers/ClientsProvider';
-import { User, useUser } from '../providers/UserProvider';
+import { ApolloContext, Web3AuthContext } from '../providers/ClientsProvider';
+import { useUser } from '../providers/UserProvider';
+import { IUser } from '../providers/IUser';
+import { Web3AuthNoModal } from '@web3auth/no-modal';
+import SolanaRpc from '../util/solanaRPC';
 
 interface ClaimUsernameResponse {
-    claimUsername: User;
+    claimUsername: IUser;
 }
 
 const CLAIM_USERNAME = gql`
@@ -25,6 +28,9 @@ const CLAIM_USERNAME = gql`
         claimUsername(account: $account, sns: $sns) {
             account
             sns
+            account
+            verifier
+            verifierId
         }
     }
 `;
@@ -37,6 +43,8 @@ function ChooseUsername() {
     const inputRef = useRef<HTMLInputElement>();
     const apolloClient: ApolloClient<NormalizedCacheObject> | undefined =
         useContext(ApolloContext);
+    const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
+    
 
     async function claimSNSDomainRequest() {
         if (claiming) {
@@ -46,7 +54,8 @@ function ChooseUsername() {
             apolloClient &&
             inputRef.current &&
             inputRef.current !== null &&
-            web3User != null
+            web3User != null && 
+            web3Auth?.provider
         ) {
             const inputValue = inputRef.current.value.toLowerCase();
             try {
@@ -60,8 +69,9 @@ function ChooseUsername() {
                     },
                 });
                 if (ret.data != null) {
+                    const rpc = new SolanaRpc(web3Auth.provider);
                     // this errors b/c the the object is not typed. i'd love to just call ret.data.user on this but it errors
-                    setUser(ret.data.claimUsername);
+                    setUser(await ret.data.claimUsername.toUser(rpc));
                 }
             } catch (error) {
                 if (error instanceof ApolloError) {

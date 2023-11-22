@@ -59,7 +59,7 @@ function AppTopBar() {
                         aria-label="menu"
                         sx={{ ml: 1 }}
                         onClick={
-                            currentPage === 'send' ? handleBackClick : undefined
+                            currentPage === 'send' || currentPage === 'receive' ? handleBackClick : undefined
                         }
                     >
                         <AppTopBarIcon currentPage={currentPage} />

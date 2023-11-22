@@ -43,6 +43,7 @@
     "framer-motion": "^10.16.4",
     "graphql": "^16.8.1",
     "json2toml": "^6.0.0",
+    "notistack": "^3.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rollup": "^1.20.0",

@@ -8,12 +8,14 @@ import LoggedOut from './pages/LoggedOut';
 import { ApolloClient, NormalizedCacheObject, gql } from '@apollo/client';
 import './App.css';
 import { ApolloContext, Web3AuthContext } from './providers/ClientsProvider';
-import { User, useUser } from './providers/UserProvider';
+import { useUser } from './providers/UserProvider';
+import { IUserImpl, IUser } from './providers/IUser';
 import AppLoading from './pages/AppLoading';
 import { AnimatePresence, motion } from 'framer-motion';
+import SolanaRpc from './util/solanaRPC';
 
 interface CreateUserResponse {
-    createUser: User;
+    createUser: IUser;
 }
 
 const CREATE_USER = gql`
@@ -33,6 +35,8 @@ const CREATE_USER = gql`
         ) {
             account
             sns
+            verifier
+            verifierId
         }
     }
 `;
@@ -61,7 +65,7 @@ function App() {
     const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
 
     const createOrLoginUser = async (account: string) => {
-        if (account == '' || apolloClient == null || web3User == null) {
+        if (account == '' || apolloClient == null || web3User == null || web3Auth == null || !web3Auth.provider) {
             return;
         }
         const ret = await apolloClient.mutate<CreateUserResponse>({
@@ -75,7 +79,11 @@ function App() {
                 verifier: web3User.verifier,
             },
         });
-        setUser(ret.data ? ret.data.createUser : null);
+        const rpc = new SolanaRpc(web3Auth.provider);
+        if (ret.data) {
+            const userImpl = new IUserImpl(ret.data.createUser);
+            setUser(await userImpl.toUser(rpc));
+        }
     };
 
     useEffect(() => {
