@@ -145,8 +145,7 @@ function ChooseUsername() {
                             ? 'Claiming ' +
                               inputRef.current.value.toLowerCase() +
                               '.' +
-                              import.meta.env.VITE_SNS_PARENT_DOMAIN +
-                              ' name'
+                              import.meta.env.VITE_SNS_PARENT_DOMAIN
                             : 'Choose Username'}
                     </>
                 </Box>

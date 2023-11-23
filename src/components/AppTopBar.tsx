@@ -7,6 +7,7 @@ import { Web3AuthNoModal } from '@web3auth/no-modal';
 import { useContext, useEffect, useState } from 'react';
 import { Web3AuthContext } from '../providers/ClientsProvider';
 import LogoutIcon from '@mui/icons-material/Logout';
+import ProfileIcon from '@mui/icons-material/AccountCircle';
 
 function AppTopBar() {
     const { currentPage, setCurrentPage, setLoggedIn } = useUser();
@@ -48,6 +49,8 @@ function AppTopBar() {
         setLoggedIn(false);
     };
 
+    const backPages = ['send', 'receive', 'profile'];
+
     return (
         <AppBar position="fixed">
             <Toolbar style={{ padding: '0' }}>
@@ -59,7 +62,7 @@ function AppTopBar() {
                         aria-label="menu"
                         sx={{ ml: 1 }}
                         onClick={
-                            currentPage === 'send' || currentPage === 'receive' ? handleBackClick : undefined
+                            backPages.indexOf(currentPage) > -1 ? handleBackClick : undefined
                         }
                     >
                         <AppTopBarIcon currentPage={currentPage} />
@@ -82,6 +85,16 @@ function AppTopBar() {
                     </motion.div>
                 </div>
                 <div style={{ flex: 1, textAlign: 'right' }}>
+                <IconButton
+                        size="large"
+                        edge="start"
+                        color="inherit"
+                        aria-label="menu"
+                        sx={{ mr: 1 }}
+                        onClick={() => setCurrentPage('profile')}
+                    >
+                        <ProfileIcon />
+                    </IconButton>                    
                     <IconButton
                         size="large"
                         edge="start"

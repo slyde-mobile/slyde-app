@@ -4,6 +4,7 @@ function AppTopBarIcon(props: { currentPage: string }) {
     switch (props.currentPage) {
         case 'send':
         case 'receive':
+        case 'profile':
             return <ArrowBackIcon />;
         default:
             return <></>;

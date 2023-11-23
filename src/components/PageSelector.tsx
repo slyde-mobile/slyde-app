@@ -1,4 +1,5 @@
 import AddFunds from '../pages/AddFunds';
+import ProfilePage from '../pages/Profile';
 import { useUser } from '../providers/UserProvider';
 import ChooseUsername from './../pages/ChooseUsername';
 import Dashboard from './../pages/Dashboard';
@@ -12,7 +13,9 @@ const PageSelector = () => {
             case 'send':
                 return <SendPrompt />;
             case 'receive':
-                    return <AddFunds />;
+                return <AddFunds />;
+            case 'profile':
+                return <ProfilePage />;
             default:
                 return <Dashboard />;
         }

@@ -37,6 +37,8 @@ const CREATE_USER = gql`
             sns
             verifier
             verifierId
+            emailAddress
+            name
         }
     }
 `;
