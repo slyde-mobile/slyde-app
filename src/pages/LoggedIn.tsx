@@ -1,14 +1,17 @@
-import { useUser } from '../providers/UserProvider';
 import { Container, Snackbar } from '@mui/material';
 import AppTopBar from '../components/AppTopBar';
 import PageSelector from '../components/PageSelector';
+import { ActionTypes, useGlobalState } from '../providers/GlobalStateProvider';
 
 function LoggedIn() {
-    const { processingTransactionState, setProcessingTransactionState } =
-        useUser();
+    const { dispatch, state } = useGlobalState();
+    const { processingTransactionState } = state;
 
     const hideToast = () => {
-        setProcessingTransactionState('not_started');
+        dispatch({
+            type: ActionTypes.SetTransactionState,
+            payload: 'not_started',
+        });
     };
 
     return (

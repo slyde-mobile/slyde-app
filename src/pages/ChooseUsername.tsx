@@ -14,13 +14,13 @@ import {
     gql,
 } from '@apollo/client';
 import { ApolloContext, Web3AuthContext } from '../providers/ClientsProvider';
-import { useUser } from '../providers/UserProvider';
-import { IUser } from '../providers/IUser';
+import { User } from '../providers/User';
 import { Web3AuthNoModal } from '@web3auth/no-modal';
 import SolanaRpc from '../util/solanaRPC';
+import { ActionTypes, useGlobalState } from '../providers/GlobalStateProvider';
 
 interface ClaimUsernameResponse {
-    claimUsername: IUser;
+    claimUsername: User;
 }
 
 const CLAIM_USERNAME = gql`
@@ -30,6 +30,8 @@ const CLAIM_USERNAME = gql`
             sns
             verifier
             verifierId
+            emailAddress
+            name
         }
     }
 `;
@@ -37,13 +39,13 @@ const CLAIM_USERNAME = gql`
 function ChooseUsername() {
     const [claiming, setClaiming] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const { web3User, account, setUser } = useUser();
+    const { dispatch, state } = useGlobalState();
+    const { web3User } = state;
 
     const inputRef = useRef<HTMLInputElement>();
     const apolloClient: ApolloClient<NormalizedCacheObject> | undefined =
         useContext(ApolloContext);
     const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
-    
 
     async function claimSNSDomainRequest() {
         if (claiming) {
@@ -53,24 +55,34 @@ function ChooseUsername() {
             apolloClient &&
             inputRef.current &&
             inputRef.current !== null &&
-            web3User != null && 
+            web3User != null &&
             web3Auth?.provider
         ) {
             const inputValue = inputRef.current.value.toLowerCase();
             try {
                 setError(null);
                 setClaiming(true);
+                const rpc = new SolanaRpc(web3Auth.provider);
+                const accounts = await rpc.getAccounts();
                 const ret = await apolloClient.mutate<ClaimUsernameResponse>({
                     mutation: CLAIM_USERNAME,
                     variables: {
-                        account,
+                        account: accounts[0],
                         sns: inputValue.trim(),
                     },
                 });
                 if (ret.data != null) {
-                    const rpc = new SolanaRpc(web3Auth.provider);
-                    // this errors b/c the the object is not typed. i'd love to just call ret.data.user on this but it errors
-                    setUser(await ret.data.claimUsername.toUser(rpc));
+                    const user = new User(
+                        ret.data.claimUsername.sns,
+                        ret.data.claimUsername.emailAddress,
+                        ret.data.claimUsername.account,
+                        ret.data.claimUsername.verifier,
+                        ret.data.claimUsername.verifierId,
+                        ret.data.claimUsername.name,
+                        new Date(),
+                    );
+                    await user.populateSNSAccount();
+                    dispatch({ type: ActionTypes.SetUser, payload: user });
                 }
             } catch (error) {
                 if (error instanceof ApolloError) {
@@ -150,13 +162,6 @@ function ChooseUsername() {
                     </>
                 </Box>
             </Button>
-            {account && (
-                <div style={{ display: 'none' }}>
-                    <Typography variant="caption" color="textSecondary">
-                        {account}
-                    </Typography>
-                </div>
-            )}
         </div>
     );
 }

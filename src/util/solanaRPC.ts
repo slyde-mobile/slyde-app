@@ -18,7 +18,7 @@ import { CustomChainConfig, IProvider } from '@web3auth/base';
 import { SolanaWallet } from '@web3auth/solana-provider';
 import ISnsAccount from '../types/snsAccount';
 
-const USDC_MINT = new PublicKey(import.meta.env.VITE_USDC_MINT_ADDRESS); // USDC mainnet Circle mint
+export const USDC_MINT = new PublicKey(import.meta.env.VITE_USDC_MINT_ADDRESS); // USDC mainnet Circle mint
 const TOKEN_PROGRAM_ID = new PublicKey(
     import.meta.env.VITE_USDC_TOKEN_PROGRAM_ID,
 ); // USDC mainnet spl-token program id
@@ -91,7 +91,8 @@ export default class SolanaRpc {
         subdomain: string,
     ): Promise<ISnsAccount | null> => {
         if (subdomain.indexOf('.') === -1) {
-            subdomain = subdomain + '.' + import.meta.env.VITE_SNS_PARENT_DOMAIN;
+            subdomain =
+                subdomain + '.' + import.meta.env.VITE_SNS_PARENT_DOMAIN;
         }
         const subdomainAccount = await this.getAddressForSubdomain(subdomain);
         if (!subdomainAccount) {

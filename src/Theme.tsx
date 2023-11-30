@@ -23,7 +23,7 @@ const Theme = createTheme({
         },
         text: {
             primary: '#fff',
-            secondary: '#f2b842',            
+            secondary: '#f2b842',
         },
     },
     components: {
@@ -78,7 +78,6 @@ const Theme = createTheme({
                         borderColor: '#cc9900',
                     },
                 },
-
             },
         },
         MuiAppBar: {

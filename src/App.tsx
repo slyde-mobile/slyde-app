@@ -8,14 +8,13 @@ import LoggedOut from './pages/LoggedOut';
 import { ApolloClient, NormalizedCacheObject, gql } from '@apollo/client';
 import './App.css';
 import { ApolloContext, Web3AuthContext } from './providers/ClientsProvider';
-import { useUser } from './providers/UserProvider';
-import { IUserImpl, IUser } from './providers/IUser';
+import { User } from './providers/User';
 import AppLoading from './pages/AppLoading';
 import { AnimatePresence, motion } from 'framer-motion';
-import SolanaRpc from './util/solanaRPC';
+import { ActionTypes, useGlobalState } from './providers/GlobalStateProvider';
 
 interface CreateUserResponse {
-    createUser: IUser;
+    createUser: User;
 }
 
 const CREATE_USER = gql`
@@ -45,29 +44,23 @@ const CREATE_USER = gql`
 
 function App() {
     const [loading, setLoading] = useState<boolean>(true);
-    const [web3authInitialized, setWeb3authInitialized] =
-        useState<boolean>(false);
 
-    const {
-        web3User,
-        loggedIn,
-        account,
-        appReady,
-        appLoading,
-        setUser,
-        setWeb3User,
-        setLoggedIn,
-        setAccount,
-        setWeb3AuthKey,
-        setAppLoading,
-    } = useUser();
+    const { dispatch, state } = useGlobalState();
+
+    const { web3User, appState } = state;
 
     const apolloClient: ApolloClient<NormalizedCacheObject> | undefined =
         useContext(ApolloContext);
     const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
 
     const createOrLoginUser = async (account: string) => {
-        if (account == '' || apolloClient == null || web3User == null || web3Auth == null || !web3Auth.provider) {
+        if (
+            account == '' ||
+            apolloClient == null ||
+            web3User == null ||
+            web3Auth == null ||
+            !web3Auth.provider
+        ) {
             return;
         }
         const ret = await apolloClient.mutate<CreateUserResponse>({
@@ -81,10 +74,18 @@ function App() {
                 verifier: web3User.verifier,
             },
         });
-        const rpc = new SolanaRpc(web3Auth.provider);
         if (ret.data) {
-            const userImpl = new IUserImpl(ret.data.createUser);
-            setUser(await userImpl.toUser(rpc));
+            const user = new User(
+                ret.data.createUser.sns,
+                ret.data.createUser.emailAddress,
+                ret.data.createUser.account,
+                ret.data.createUser.verifier,
+                ret.data.createUser.verifierId,
+                ret.data.createUser.name,
+                new Date(),
+            );
+            await user.populateSNSAccount();
+            dispatch({ type: ActionTypes.SetUser, payload: user });
         }
     };
 
@@ -98,77 +99,67 @@ function App() {
             //    b. Local derivation: Derive the web3auth public key from the private key
             //    c. Web3Auth call: Get the solana addresses from the user
             //    d. Graphql: Get the user from the server. We can see if this user exists, or create one if they don't.
-            if (
-                web3Auth &&
-                !web3authInitialized &&
-                web3Auth.status == ADAPTER_STATUS.NOT_READY
-            ) {
-                setWeb3authInitialized(true);
-            } else if (
-                web3Auth != null &&
-                web3Auth.connected &&
-                web3Auth.provider
-            ) {
-                setWeb3authInitialized(true);
-                setWeb3AuthKey(await getWeb3AuthPublicKey(web3Auth));
-
-                const userInfo = await web3Auth.getUserInfo();
-                setWeb3User(userInfo);
-            } else if (
-                web3Auth != null &&
-                !web3Auth.connected &&
-                web3Auth.status == ADAPTER_STATUS.READY
-            ) {
-                setWeb3authInitialized(true);
-                setLoading(false);
+            if (web3Auth != null) {
+                if (web3Auth.status == ADAPTER_STATUS.NOT_READY) {
+                    dispatch({
+                        type: ActionTypes.UpdateAppState,
+                        payload: 'NOT_READY',
+                    });
+                } else if (
+                    web3Auth.connected &&
+                    (web3Auth.status == ADAPTER_STATUS.READY ||
+                        web3Auth.status == ADAPTER_STATUS.CONNECTED)
+                ) {
+                    // LOGGED IN & READY
+                    dispatch({
+                        type: ActionTypes.SetWeb3AuthKey,
+                        payload: await getWeb3AuthPublicKey(web3Auth),
+                    });
+                    dispatch({
+                        type: ActionTypes.SetWeb3User,
+                        payload: await web3Auth.getUserInfo(),
+                    });
+                    dispatch({
+                        type: ActionTypes.UpdateAppState,
+                        payload: 'CLIENTS_INITIALIZED',
+                    });
+                    if (web3Auth.provider) {
+                        const rpc = new RPC(web3Auth.provider);
+                        const accounts = await rpc.getAccounts();
+                        await createOrLoginUser(accounts[0]);
+                        dispatch({
+                            type: ActionTypes.UpdateAppState,
+                            payload: 'LOGGED_IN',
+                        });
+                        if (loading) {
+                            setTimeout(() => {
+                                setLoading(false);
+                            }, 2000);
+                        }
+                    }
+                } else if (
+                    !web3Auth.connected &&
+                    (web3Auth.status == ADAPTER_STATUS.READY ||
+                        web3Auth.status == ADAPTER_STATUS.CONNECTED)
+                ) {
+                    // LOGGED OUT & READY
+                    setLoading(false);
+                    dispatch({
+                        type: ActionTypes.UpdateAppState,
+                        payload: 'CLIENTS_INITIALIZED',
+                    });
+                }
             }
         };
         init();
-    }, [web3Auth, web3authInitialized, loggedIn]);
+    }, [web3Auth, appState]);
 
-    useEffect(() => {
-        const initUser = async () => {
-            if (
-                web3User &&
-                web3Auth &&
-                web3Auth.connected &&
-                web3Auth.provider &&
-                account == ''
-            ) {
-                const rpc = new RPC(web3Auth.provider);
-                const accounts = await rpc.getAccounts();
-                setAccount(accounts[0]);
-
-                await createOrLoginUser(accounts[0]);
-                if (!loggedIn) {
-                    setLoggedIn(true);
-                }
-                if (loading) {
-                    setLoading(false);
-                }
-            }
-        };
-        initUser();
-    }, [web3User]);
-
-    const loggedInProps = {};
-
-    const ConditionalComponent = ({ ...props }) => {
-        useEffect(() => {
-            if (!loading && setAppLoading) {
-                const timeoutId = setTimeout(() => {
-                    if (setAppLoading) {
-                        setAppLoading(false);
-                    }
-                }, 2000); // Set showLoading to false after 2 seconds
-
-                return () => clearTimeout(timeoutId); // Clear the timeout if the component unmounts
-            }
-        }, [loading]);
-
+    const ConditionalComponent = () => {
         return (
             <AnimatePresence mode="wait">
-                {appLoading ? (
+                {loading ||
+                (appState !== 'LOGGED_IN_READY' &&
+                    appState !== 'LOGGED_OUT_READY') ? (
                     <motion.div
                         initial={{ opacity: 1, x: 0 }}
                         key="loading"
@@ -192,10 +183,10 @@ function App() {
                         transition={{ duration: 0.2 }}
                         key="content"
                     >
-                        {loggedIn && appReady ? (
-                            <LoggedIn {...props} />
+                        {appState === 'LOGGED_IN_READY' ? (
+                            <LoggedIn />
                         ) : (
-                            <LoggedOut {...props} />
+                            <LoggedOut />
                         )}
                     </motion.div>
                 )}
@@ -205,7 +196,7 @@ function App() {
 
     return (
         <>
-            <ConditionalComponent {...loggedInProps} />
+            <ConditionalComponent />
         </>
     );
 }

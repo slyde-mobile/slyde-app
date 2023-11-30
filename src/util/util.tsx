@@ -67,3 +67,33 @@ export async function getWeb3AuthPublicKey(
     // @ts-expect-error
     return getED25519Key(hexPrivKey).pk.toString('hex');
 }
+
+export function formatAccount(account: string) {
+    if (!account) {
+        return '';
+    }
+    if (account.length < 15) {
+        return account;
+    }
+    return `${account.substring(0, 5)}...${account.substring(
+        account.length - 5,
+        account.length,
+    )}`;
+}
+
+export function formatDate(date: Date) {
+    const dateString = date.toLocaleDateString('en-US', {
+        year: '2-digit',
+        month: 'short',
+        day: 'numeric',
+    });
+    const timeString = date
+        .toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+        })
+        .toLowerCase();
+
+    return `${dateString}, ${timeString}`;
+}

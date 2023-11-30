@@ -1,13 +1,11 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Page } from './PageSelector';
+import { backPages } from './AppTopBar';
 
-function AppTopBarIcon(props: { currentPage: string }) {
-    switch (props.currentPage) {
-        case 'send':
-        case 'receive':
-        case 'profile':
-            return <ArrowBackIcon />;
-        default:
-            return <></>;
+function AppTopBarIcon(props: { currentPage: Page }) {
+    if (backPages.includes(props.currentPage)) {
+        return <ArrowBackIcon />;
     }
+    return <></>;
 }
 export default AppTopBarIcon;

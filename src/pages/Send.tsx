@@ -6,7 +6,6 @@ import {
     Typography,
     CircularProgress,
 } from '@mui/material';
-import { useUser } from '../providers/UserProvider';
 import RPC from '../util/solanaRPC';
 import { Web3AuthNoModal } from '@web3auth/no-modal';
 import { useContext } from 'react';
@@ -14,8 +13,9 @@ import { Web3AuthContext } from '../providers/ClientsProvider';
 import { gql, useMutation } from '@apollo/client';
 import { motion } from 'framer-motion';
 import SearchBySNS from './SearchBySns';
-import { IUser } from '../providers/IUser';
-
+import { IUser } from '../providers/User';
+import { ActionTypes, useGlobalState } from '../providers/GlobalStateProvider';
+import { Page } from '../components/PageSelector';
 
 export type SelectUserEvent = {
     user: IUser | null;
@@ -23,9 +23,18 @@ export type SelectUserEvent = {
     event: string;
 };
 
-
 const SIGN_TRANSACTION = gql`
-    mutation SendMoney($serializedTransaction: [Int!]!, $blockHash: String!, $fromSnsName: String, $fromAccount: String, $fromTokenAccount: String, $toSnsName: String, $toAccount: String, $toTokenAccount: String, $token: String) {
+    mutation SendMoney(
+        $serializedTransaction: [Int!]!
+        $blockHash: String!
+        $fromSnsName: String
+        $fromAccount: String
+        $fromTokenAccount: String
+        $toSnsName: String
+        $toAccount: String
+        $toTokenAccount: String
+        $token: String
+    ) {
         sendMoney(
             serializedTransaction: $serializedTransaction
             blockHash: $blockHash
@@ -35,7 +44,7 @@ const SIGN_TRANSACTION = gql`
             toSnsName: $toSnsName
             toAccount: $toAccount
             toTokenAccount: $toTokenAccount
-            token: $token            
+            token: $token
         ) {
             signature
         }
@@ -68,13 +77,8 @@ function SendPrompt() {
     const [memoError, setMemoError] = useState<string | null>(null);
     const [snsError, setSnsError] = useState<string | null>(null);
     const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
-    const {
-        account,
-        user,
-        userBalance,
-        setProcessingTransactionState,
-        setCurrentPage,
-    } = useUser();
+    const { dispatch, state } = useGlobalState();
+    const { user, userBalance } = state;
 
     const snsRef = useRef<HTMLInputElement>();
     const amountRef = useRef<HTMLInputElement>();
@@ -98,13 +102,12 @@ function SendPrompt() {
         }
     };
 
-
     const onSend = async () => {
         if (
             web3Auth == null ||
             web3Auth.provider == null ||
             user == null ||
-        user.snsAccount == null ||
+            user.snsAccount == null ||
             userBalance == null
         ) {
             return;
@@ -167,8 +170,14 @@ function SendPrompt() {
         const signedTxn = await rpc.signTransaction(txn);
 
         const handleSignTransaction = async () => {
-            setProcessingTransactionState('processing');
-            setCurrentPage('dashboard');
+            dispatch({
+                type: ActionTypes.SetTransactionState,
+                payload: 'processing',
+            });
+            dispatch({
+                type: ActionTypes.SetCurrentPage,
+                payload: { page: Page.Dashboard, object: null },
+            });
             await signTransaction({
                 variables: {
                     serializedTransaction: Array.from(
@@ -177,7 +186,7 @@ function SendPrompt() {
                         }),
                     ),
                     blockHash: signedTxn.recentBlockhash,
-                    fromSnsName: from.account,
+                    fromSnsName: from.snsName,
                     fromAccount: from.account,
                     fromTokenAccount: from.usdcAccount,
                     toSnsName: to.snsName,
@@ -186,13 +195,19 @@ function SendPrompt() {
                     token: 'USDC',
                 },
             });
-            setProcessingTransactionState('completed');
+            dispatch({
+                type: ActionTypes.SetTransactionState,
+                payload: 'completed',
+            });
         };
 
         await handleSignTransaction();
     };
 
-    const snsWithoutDomain = user?.snsAccount?.snsName?.replace('.' + import.meta.env.VITE_SNS_PARENT_DOMAIN, '');
+    const snsWithoutDomain = user?.snsAccount?.snsName?.replace(
+        '.' + import.meta.env.VITE_SNS_PARENT_DOMAIN,
+        '',
+    );
 
     return (
         <motion.div
@@ -211,7 +226,12 @@ function SendPrompt() {
                 // Add additional styling as needed
             }}
         >
-            {isSearchVisible && <SearchBySNS onSelect={handleSelectUser} value={snsRef.current!.value} />}
+            {isSearchVisible && (
+                <SearchBySNS
+                    onSelect={handleSelectUser}
+                    value={snsRef.current!.value}
+                />
+            )}
             <div style={{ marginTop: '64px' }}>
                 <div style={{ padding: '20px' }}>
                     <div
@@ -378,13 +398,6 @@ function SendPrompt() {
                     >
                         {sending ? <CircularProgress size={24} /> : 'Send USDC'}
                     </Button>
-                    {account && (
-                        <div style={{ display: 'none' }}>
-                            <Typography variant="caption" color="textSecondary">
-                                {account}
-                            </Typography>
-                        </div>
-                    )}
                 </div>
             </div>
         </motion.div>

@@ -1,16 +1,26 @@
 import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
 import { motion } from 'framer-motion';
-
-import { useUser } from '../providers/UserProvider';
 import AppTopBarIcon from './AppTopBarIcon';
 import { Web3AuthNoModal } from '@web3auth/no-modal';
 import { useContext, useEffect, useState } from 'react';
 import { Web3AuthContext } from '../providers/ClientsProvider';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ProfileIcon from '@mui/icons-material/AccountCircle';
+import { ActionTypes, useGlobalState } from '../providers/GlobalStateProvider';
+import { AppStateTransition } from '../types/AppState';
+import { Page } from './PageSelector';
+
+export const backPages = [
+    Page.Send,
+    Page.Receive,
+    Page.Profile,
+    Page.UserProfile,
+    Page.TransactionDetail,
+];
 
 function AppTopBar() {
-    const { currentPage, setCurrentPage, setLoggedIn } = useUser();
+    const { dispatch, state } = useGlobalState();
+    const { currentPage } = state;
     const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
 
     const [showSlydeText, setShowSlydeText] = useState(true);
@@ -38,7 +48,10 @@ function AppTopBar() {
     }, [showSlydeText]);
 
     const handleBackClick = () => {
-        setCurrentPage('dashboard');
+        dispatch({
+            type: ActionTypes.SetCurrentPage,
+            payload: { page: Page.Dashboard, object: null },
+        });
     };
 
     const logout = async () => {
@@ -46,10 +59,11 @@ function AppTopBar() {
             return;
         }
         await web3Auth.logout();
-        setLoggedIn(false);
+        dispatch({
+            type: ActionTypes.UpdateAppState,
+            payload: AppStateTransition.LoggedOut,
+        });
     };
-
-    const backPages = ['send', 'receive', 'profile'];
 
     return (
         <AppBar position="fixed">
@@ -62,7 +76,9 @@ function AppTopBar() {
                         aria-label="menu"
                         sx={{ ml: 1 }}
                         onClick={
-                            backPages.indexOf(currentPage) > -1 ? handleBackClick : undefined
+                            backPages.indexOf(currentPage) > -1
+                                ? handleBackClick
+                                : undefined
                         }
                     >
                         <AppTopBarIcon currentPage={currentPage} />
@@ -85,16 +101,21 @@ function AppTopBar() {
                     </motion.div>
                 </div>
                 <div style={{ flex: 1, textAlign: 'right' }}>
-                <IconButton
+                    <IconButton
                         size="large"
                         edge="start"
                         color="inherit"
                         aria-label="menu"
                         sx={{ mr: 1 }}
-                        onClick={() => setCurrentPage('profile')}
+                        onClick={() =>
+                            dispatch({
+                                type: ActionTypes.SetCurrentPage,
+                                payload: { page: Page.Profile, object: null },
+                            })
+                        }
                     >
                         <ProfileIcon />
-                    </IconButton>                    
+                    </IconButton>
                     <IconButton
                         size="large"
                         edge="start"

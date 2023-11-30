@@ -10,7 +10,8 @@ import { setContext } from '@apollo/client/link/context';
 import { Web3AuthNoModal } from '@web3auth/no-modal';
 import { createWeb3Auth } from '../util/util';
 import { ADAPTER_EVENTS } from '@web3auth/base';
-import { useUser } from './UserProvider';
+import { ActionTypes, useGlobalState } from './GlobalStateProvider';
+import { AppStateTransition } from '../types/AppState';
 
 export const ApolloContext = createContext<
     ApolloClient<NormalizedCacheObject> | undefined
@@ -53,8 +54,8 @@ export const ClientsProvider: React.FC<
 > = ({ children, onConnecting, onConnected }) => {
     const [state, dispatch] = useReducer(clientsReducer, {});
     const initializedRef = React.useRef<boolean>(false);
-    const { web3AuthKey, web3User, updateAppReady, loggedIn, setLoggedIn } =
-        useUser();
+    const globalState = useGlobalState();
+    const { web3AuthKey, web3User, appState } = globalState.state;
 
     const httpLink = new HttpLink({
         uri: import.meta.env.VITE_GRAPHQL_SERVER_URL,
@@ -73,7 +74,10 @@ export const ClientsProvider: React.FC<
 
                 web3Auth.on(ADAPTER_EVENTS.CONNECTED, async () => {
                     onConnected();
-                    setLoggedIn(true);
+                    globalState.dispatch({
+                        type: ActionTypes.UpdateAppState,
+                        payload: AppStateTransition.LoggedIn,
+                    });
                 });
                 web3Auth.on(ADAPTER_EVENTS.CONNECTING, () => {
                     onConnecting();
@@ -132,9 +136,12 @@ export const ClientsProvider: React.FC<
             state.web3Auth != null &&
             state.web3Auth.connected
         ) {
-            updateAppReady({ clientsInitialized: true, authTokensReady: true });
+            globalState.dispatch({
+                type: ActionTypes.UpdateAppState,
+                payload: AppStateTransition.ClientsInitialized,
+            });
         }
-    }, [state.apolloClient, state.web3Auth, loggedIn]);
+    }, [state.apolloClient, state.web3Auth, appState]);
 
     return (
         <ApolloContext.Provider value={state.apolloClient}>

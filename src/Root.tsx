@@ -3,7 +3,7 @@ import theme from './Theme';
 import './App.css';
 import App from './App';
 import { ClientsProvider } from './providers/ClientsProvider';
-import { UserProvider } from './providers/UserProvider';
+import { GlobalStateProvider } from './providers/GlobalStateProvider';
 
 function Root() {
     const onConnected = () => {
@@ -19,14 +19,14 @@ function Root() {
 
     return (
         <ThemeProvider theme={theme}>
-            <UserProvider>
+            <GlobalStateProvider>
                 <ClientsProvider
                     onConnecting={onConnecting}
                     onConnected={onConnected}
                 >
                     <App />
                 </ClientsProvider>
-            </UserProvider>
+            </GlobalStateProvider>
         </ThemeProvider>
     );
 }

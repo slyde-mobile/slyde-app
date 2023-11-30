@@ -1,5 +1,4 @@
 import { Typography, Button, Divider, Box } from '@mui/material';
-import { useUser } from '../providers/UserProvider';
 import TransactionHistory from '../components/TransactionHistory';
 import Balance from '../components/Balance';
 import { motion } from 'framer-motion';
@@ -7,9 +6,11 @@ import { useEffect, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import ReceiveIcon from '@mui/icons-material/AttachMoneyRounded';
 import AddIcon from '@mui/icons-material/AddCircleOutline';
+import { ActionTypes, useGlobalState } from '../providers/GlobalStateProvider';
+import { Page } from '../components/PageSelector';
 
 function Dashboard() {
-    const { setCurrentPage } = useUser();
+    const { dispatch } = useGlobalState();
     // const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
     const [isScrolled, setIsScrolled] = useState(false);
 
@@ -25,11 +26,17 @@ function Dashboard() {
     }, []);
 
     const onSend = () => {
-        setCurrentPage('send');
+        dispatch({
+            type: ActionTypes.SetCurrentPage,
+            payload: { page: Page.Send, object: null },
+        });
     };
 
     const onAddFunds = () => {
-        setCurrentPage('receive');
+        dispatch({
+            type: ActionTypes.SetCurrentPage,
+            payload: { page: Page.Receive, object: null },
+        });
     };
 
     return (
@@ -88,7 +95,7 @@ function Dashboard() {
                     disabled
                 >
                     Request
-                </Button>                
+                </Button>
                 <Box sx={{ height: '2rem', flexGrow: 10, flexBasis: 'auto' }} />
             </Box>
 
