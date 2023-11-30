@@ -39,40 +39,88 @@ const TransactionDetail = () => {
                 justifyContent="space-between"
             >
                 <Typography variant="h6" color="secondary">
-                    <span
-                        style={{
-                            cursor: 'pointer',
-                        }}
-                        onClick={() => {
-                            loadProfilePage(
-                                transactionDetail.rollup.fromAccount,
-                            );
-                        }}
-                    >
-                        @
-                        {formatAccount(
-                            transactionDetail.rollup.fromSns.split('.')[0],
-                        )}
-                    </span>{' '}
-                    <span style={{ color: theme.palette.text.primary }}>
-                        paid
-                    </span>{' '}
-                    <span
-                        style={{
-                            cursor: 'pointer',
-                        }}
-                        onClick={() => {
-                            loadProfilePage(transactionDetail.rollup.toAccount);
-                        }}
-                    >
-                        @
-                        {formatAccount(
-                            transactionDetail.rollup.toSns.split('.')[0],
-                        )}
-                    </span>{' '}
-                    <span style={{ color: theme.palette.text.primary }}>
-                        ${transactionDetail.instructions[0].uiAmountString}
-                    </span>{' '}
+                    {transactionDetail.rollup &&
+                    transactionDetail.rollup.fromSns ? (
+                        <>
+                            <span
+                                style={{
+                                    cursor: 'pointer',
+                                }}
+                                onClick={() => {
+                                    loadProfilePage(
+                                        transactionDetail.rollup.fromAccount,
+                                    );
+                                }}
+                            >
+                                @
+                                {formatAccount(
+                                    transactionDetail.rollup.fromSns.split(
+                                        '.',
+                                    )[0],
+                                )}
+                            </span>{' '}
+                            <span style={{ color: theme.palette.text.primary }}>
+                                paid
+                            </span>{' '}
+                            <span
+                                style={{
+                                    cursor: 'pointer',
+                                }}
+                                onClick={() => {
+                                    loadProfilePage(
+                                        transactionDetail.rollup.toAccount,
+                                    );
+                                }}
+                            >
+                                @
+                                {formatAccount(
+                                    transactionDetail.rollup.toSns.split(
+                                        '.',
+                                    )[0],
+                                )}
+                            </span>{' '}
+                            <span style={{ color: theme.palette.text.primary }}>
+                                $
+                                {
+                                    transactionDetail.instructions[0]
+                                        .uiAmountString
+                                }
+                            </span>{' '}
+                        </>
+                    ) : (
+                        <>
+                            <span
+                                style={{
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                @
+                                {formatAccount(
+                                    transactionDetail.instructions[0].from,
+                                )}
+                            </span>{' '}
+                            <span style={{ color: theme.palette.text.primary }}>
+                                paid
+                            </span>{' '}
+                            <span
+                                style={{
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                @
+                                {formatAccount(
+                                    transactionDetail.instructions[0].to,
+                                )}
+                            </span>{' '}
+                            <span style={{ color: theme.palette.text.primary }}>
+                                $
+                                {
+                                    transactionDetail.instructions[0]
+                                        .uiAmountString
+                                }
+                            </span>{' '}
+                        </>
+                    )}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                     {formatDate(new Date(transactionDetail.createdAt))}
