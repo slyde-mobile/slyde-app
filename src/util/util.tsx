@@ -41,6 +41,9 @@ export async function createWeb3Auth(): Promise<Web3AuthNoModal> {
 
     const openloginAdapter = new OpenloginAdapter({
         privateKeyProvider,
+        adapterSettings: {
+            uxMode: 'redirect',
+        },
     });
 
     web3auth.configureAdapter(openloginAdapter);

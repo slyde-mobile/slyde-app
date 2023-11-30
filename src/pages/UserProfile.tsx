@@ -31,7 +31,6 @@ function UserProfile() {
         any
     >(GET_USER);
 
-    console.log('userProfileAccount', userProfileAccount);
     useEffect(() => {
         if (userProfileAccount) {
             getUser({

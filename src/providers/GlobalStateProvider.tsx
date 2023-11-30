@@ -62,7 +62,6 @@ const globalStateReducer = (
     state: GlobalState,
     action: ActionType,
 ): GlobalState => {
-    console.log('globalStateReducer', action);
     switch (action.type) {
         case ActionTypes.SetUser:
             return { ...state, user: action.payload };
