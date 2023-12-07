@@ -39,6 +39,7 @@ const CLAIM_USERNAME = gql`
 function ChooseUsername() {
     const [claiming, setClaiming] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [username, setUsername] = useState('');
     const { dispatch, state } = useGlobalState();
     const { web3User } = state;
 
@@ -46,6 +47,15 @@ function ChooseUsername() {
     const apolloClient: ApolloClient<NormalizedCacheObject> | undefined =
         useContext(ApolloContext);
     const web3Auth: Web3AuthNoModal | undefined = useContext(Web3AuthContext);
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const rawInput = event.target.value;
+        // Allow only alphanumerics, underscores, dashes and convert to lowercase
+        const sanitizedInput = rawInput
+            .toLowerCase()
+            .replace(/[^a-z0-9_-]/g, '');
+        setUsername(sanitizedInput);
+    };
 
     async function claimSNSDomainRequest() {
         if (claiming) {
@@ -120,6 +130,8 @@ function ChooseUsername() {
                     placeholder="Enter your username"
                     color="secondary"
                     inputRef={inputRef}
+                    value={username}
+                    onChange={handleInputChange}
                     error={!!error}
                     helperText={error}
                     inputProps={{ style: { color: 'white' } }}

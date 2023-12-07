@@ -26,12 +26,13 @@ export function TransactionHistoryItem({
             <ListItemButton onClick={() => loadTransactionPage(transaction)}>
                 <div
                     style={{
-                        flex: 1,
+                        width: 'auto',
+                        alignSelf: 'flex-start',
                     }}
                 >
                     <IconButton
                         sx={{
-                            fontSize: '2rem',
+                            fontSize: '2.5rem',
                             color: '#222',
                             borderRadius: 0,
                             backgroundColor:
@@ -60,7 +61,7 @@ export function TransactionHistoryItem({
                 </div>
                 <div
                     style={{
-                        flex: 5,
+                        width: 'auto',
                         alignSelf: 'flex-start',
                         textAlign: 'right',
                     }}
@@ -79,7 +80,10 @@ export function TransactionHistoryItem({
                             : '-'}
                         ${transaction.instructions[0].uiAmountString}
                     </Typography>
-                    <Typography variant="body2">
+                    <Typography
+                        variant="body2"
+                        style={{ whiteSpace: 'nowrap' }}
+                    >
                         {formatDate(new Date(transaction.createdAt))}
                     </Typography>
                     <Typography variant="body2">

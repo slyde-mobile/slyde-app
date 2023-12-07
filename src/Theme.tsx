@@ -100,6 +100,15 @@ const Theme = createTheme({
                 },
             },
         },
+        MuiCircularProgress: {
+            styleOverrides: {
+                root: {
+                    '&:focus': {
+                        outline: 'none',
+                    },
+                },
+            },
+        },
     },
 });
 

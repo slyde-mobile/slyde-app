@@ -53,13 +53,17 @@ function SearchBySNS({
     const [executeSearch, { data, error }] =
         useLazyQuery<SearchBySNSResponse>(SEARCH_BY_SNS);
     const listRef = useRef<HTMLUListElement>(null);
+    const listItemClicked = useRef<boolean>(false);
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
-        setSearchTerm(value);
+        const rawInput = event.target.value;
+        const sanitizedInput = rawInput
+            .toLowerCase()
+            .replace(/[^a-z0-9_-]/g, '');
+        setSearchTerm(sanitizedInput);
 
-        if (value.length > 2) {
-            executeSearch({ variables: { sns: value } });
+        if (sanitizedInput.length > 2) {
+            executeSearch({ variables: { sns: sanitizedInput } });
         }
     };
 
@@ -67,16 +71,18 @@ function SearchBySNS({
         // Delay the blur event to check if the user is interacting with the list
         setTimeout(() => {
             if (
-                !listRef.current ||
-                !listRef.current.contains(document.activeElement)
+                (!listRef.current ||
+                    !listRef.current.contains(document.activeElement)) &&
+                !listItemClicked.current
             ) {
                 handleSelectUser({
                     user: null,
                     event: 'blur',
                     sns: searchTerm,
                 });
+                listItemClicked.current = false;
             }
-        }, 0);
+        }, 50);
     };
 
     useEffect(() => {
@@ -87,6 +93,12 @@ function SearchBySNS({
             }
         }
     }, []);
+
+    const handleListItemClick = (user: SelectUserEvent) => {
+        listItemClicked.current = true;
+        handleSelectUser(user);
+        setSearchTerm('');
+    };
 
     return (
         <motion.div
@@ -146,7 +158,7 @@ function SearchBySNS({
                         listRef={listRef}
                         searchTerm={searchTerm}
                         error={error}
-                        handleSelectUser={handleSelectUser}
+                        handleSelectUser={handleListItemClick}
                     />
                 </div>
             </div>

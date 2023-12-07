@@ -75,17 +75,21 @@ function App() {
             },
         });
         if (ret.data) {
-            const user = new User(
-                ret.data.createUser.sns,
-                ret.data.createUser.emailAddress,
-                ret.data.createUser.account,
-                ret.data.createUser.verifier,
-                ret.data.createUser.verifierId,
-                ret.data.createUser.name,
-                new Date(),
-            );
-            await user.populateSNSAccount();
-            dispatch({ type: ActionTypes.SetUser, payload: user });
+            try {
+                const user = new User(
+                    ret.data.createUser.sns,
+                    ret.data.createUser.emailAddress,
+                    ret.data.createUser.account,
+                    ret.data.createUser.verifier,
+                    ret.data.createUser.verifierId,
+                    ret.data.createUser.name,
+                    new Date(),
+                );
+                await user.populateSNSAccount();
+                dispatch({ type: ActionTypes.SetUser, payload: user });
+            } catch (e) {
+                console.log('error', e);
+            }
         }
     };
 
